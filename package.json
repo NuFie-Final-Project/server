@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development npx nodemon bin/www.js",
-    "test": "NODE_ENV=test npx mocha --exit"
+    "devtest": "NODE_ENV=test npx nodemon bin/www.js",
+    "test": "NODE_ENV=test nyc mocha --exit"
   },
   "dependencies": {
     "aws-sdk": "^2.623.0",
@@ -26,6 +27,7 @@
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "dotenv": "^8.2.0",
-    "mocha": "^7.0.1"
+    "mocha": "^7.0.1",
+    "nyc": "^15.0.0"
   }
 }

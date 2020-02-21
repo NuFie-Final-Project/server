@@ -5,14 +5,13 @@ function errorHandler(err, req, res, next) {
     let errorCode = err.errorCode || 500;
     let message = err.message || "Internal server error";
 
-    if (err.errors) {
-        message = [];
-        for (let field in err.errors) {
-            message.push(err.errors[field].message);
-        }
-    }
-
-    console.log(message);
+    if (err.errors){
+      errorCode = 400
+      message = []
+      for (field in err.errors){
+        message.push(err.errors[field].message)
+      }
+    } 
     res.status(errorCode).json({ message });
 }
 

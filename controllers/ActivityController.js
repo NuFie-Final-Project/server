@@ -7,7 +7,6 @@ class ActivityController {
             const {
                 title,
                 description,
-                image,
                 category,
                 memberLimit,
                 due_date,
@@ -17,6 +16,9 @@ class ActivityController {
                 status,
                 isPromo
             } = req.body;
+
+            const image =
+                req.file && req.file.location ? req.file.location : "";
 
             const activity = await Activity.create({
                 owner,
@@ -68,7 +70,6 @@ class ActivityController {
             const {
                 title,
                 description,
-                image,
                 category,
                 memberLimit,
                 due_date,
@@ -76,6 +77,9 @@ class ActivityController {
                 address,
                 tags
             } = req.body;
+
+            const image =
+                req.file && req.file.location ? req.file.location : null;
 
             const inputs = {};
             if (title) inputs.title = title;

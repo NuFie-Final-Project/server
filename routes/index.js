@@ -3,6 +3,6 @@ const ActivityRoutes = require("./ActivityRoutes.js");
 const UserRoutes = require("./UserRoutes.js");
 
 router.use("/users", UserRoutes);
-router.use("/activities", InterestRoutes);
+router.use("/activities", ActivityRoutes);
 
 module.exports = router;

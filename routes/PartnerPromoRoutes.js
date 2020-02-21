@@ -7,4 +7,4 @@ router.get("/:id", PartnerPromoController.readOne);
 router.patch("/:id", PartnerPromoController.updateOne);
 router.delete("/:id", PartnerPromoController.deleteOne);
 
-module.exports = Router;
+module.exports = router;

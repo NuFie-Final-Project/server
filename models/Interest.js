@@ -1,11 +1,11 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
-const timestamp = require('mongoose-timestamp2')
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+const timestamp = require("mongoose-timestamp2");
 
 const interestSchema = new Schema({
     owner: {
         type: Schema.Types.ObjectId,
-        ref: 'User'
+        ref: "User"
     },
     title: {
         type: String
@@ -19,13 +19,27 @@ const interestSchema = new Schema({
     category: {
         type: String
     },
-    members: [{
-        type: Schema.Types.ObjectId,
-        ref: 'User'
-    }],
+    members: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "User"
+        }
+    ],
     memberLimit: {
         type: Number
     },
+    pendingInvites: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "User"
+        }
+    ],
+    pendingJoins: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "User"
+        }
+    ],
     due_date: {
         type: Date
     },
@@ -39,10 +53,10 @@ const interestSchema = new Schema({
     status: {
         type: String
     }
-})
+});
 
-interestSchema.plugin(timestamp)
+interestSchema.plugin(timestamp);
 
-const Interest = mongoose.model('Interest', interestSchema)
+const Interest = mongoose.model("Interest", interestSchema);
 
-module.exports = Interest
+module.exports = Interest;

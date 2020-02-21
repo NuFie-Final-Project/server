@@ -7,4 +7,4 @@ router.get("/:id", InterestController.readOne);
 router.patch("/:id", InterestController.updateOne);
 router.delete("/:id", InterestController.deleteOne);
 
-module.exports = Router;
+module.exports = router;

@@ -1,3 +1,5 @@
+if (process.env.NODE_ENV == "development") require("dotenv").config();
+
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -9,7 +11,8 @@ const mongodbConnectionStr = `mongodb://localhost:27017/nufie-${process.env.NODE
 
 mongoose.connect(mongodbConnectionStr, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useCreateIndex: true
 });
 
 app.use(cors());

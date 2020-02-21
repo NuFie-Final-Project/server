@@ -4,7 +4,8 @@ const timestamp = require("mongoose-timestamp2");
 
 const userSchema = new Schema({
     firstName: {
-        type: String
+        type: String,
+        required: [true, ""]
     },
     lastName: {
         type: String
@@ -12,34 +13,42 @@ const userSchema = new Schema({
     profilePicture: {
         type: String
     },
-    email: {
+    aboutMe: {
         type: String
     },
+    gender: {
+        type: String
+    },
+    email: {
+        type: String,
+        required: [true, ""],
+        unique: [true, "This email has been registered"]
+    },
     password: {
+        type: String,
+        required: [true, ""]
+    },
+    phoneNumber: {
         type: String
     },
     interests: [String],
-    promoPosts: [
+    posts: [
         {
             type: Schema.Types.ObjectId,
-            ref: "Promo"
+            ref: "Activity"
         }
-    ],
-    interestPosts: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Interest"
-        }
-    ],
-    gender: {
-        type: String
-    }
+    ]
 });
 
 userSchema.plugin(timestamp);
 
-userSchema.pre("findOneAndRemove", function(next) {
-    console.log("before remove");
+userSchema.pre("save", function(next) {
+    console.log("pre save");
+    next();
+});
+
+userSchema.pre("findOneAndDelete", function(next) {
+    next();
 });
 
 const User = mongoose.model("User", userSchema);

@@ -2,6 +2,7 @@ functions (controller):
 - user:
 -+ CRUD
 -+ firebase auth
+-+ getInviteRecommendation
 -+ getByInterest
 
 - promo:

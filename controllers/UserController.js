@@ -2,6 +2,7 @@ const User = require("../models/User.js");
 const admin = require("../services/firebase-admin");
 const { OAuth2Client } = require("google-auth-library");
 const jwt = require("jsonwebtoken");
+const { comparePassword } = require("../helpers/bcrypt");
 
 class UserController {
     static async register(req, res, next) {
@@ -10,14 +11,16 @@ class UserController {
                 .auth()
                 .verifyIdToken(req.body.idToken);
 
+            const email = decodedToken.email;
+
             const {
                 firstName,
                 lastName,
                 profilePicture,
-                email,
                 password,
                 gender,
-                interest
+                interest,
+                phoneNumber
             } = req.body;
 
             const user = await User.create({
@@ -27,7 +30,8 @@ class UserController {
                 email,
                 password,
                 gender,
-                interest
+                interest,
+                phoneNumber
             });
 
             const payload = {
@@ -80,6 +84,54 @@ class UserController {
         }
     }
 
+    static async login(req, res, next) {
+        try {
+            const { idToken } = req.body;
+
+            const decodedToken = await admin.auth().verifyIdToken(idToken);
+
+            const user = await User.findOne({ email: decodedToken.email });
+
+            const payload = {
+                userId: user._id
+            };
+
+            const token = jwt.sign(payload, process.env.JWT_SECRET);
+            res.status(200).json({ token });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async loginWithGoogle(req, res, next) {
+        try {
+            const client = new OAuth2Client(process.env.GOOGLE_SIGNIN_CLIENTID);
+
+            const ticket = await client.verifyIdToken({
+                idToken: req.body.idToken,
+                audience: process.env.GOOGLE_SIGNIN_CLIENTID
+            });
+
+            const payload = ticket.getPayload();
+            const user = await User.findOne({ email: payload.email });
+
+            if (!user)
+                throw {
+                    errorCode: 400,
+                    message: "Login with google has failed. Bad idToken"
+                };
+
+            const tokenPayload = {
+                userId: user._id
+            };
+
+            const token = jwt.sign(tokenPayload, process.env.JWT_SECRET);
+            res.status(200).json({ token });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     static async create(req, res, next) {
         try {
             const {
@@ -125,7 +177,8 @@ class UserController {
                 profilePicture,
                 email,
                 password,
-                gender
+                gender,
+                phoneNumber
             } = req.body;
 
             const inputs = {};
@@ -135,12 +188,14 @@ class UserController {
             if (email) inputs.email = email;
             if (password) inputs.password = password;
             if (gender) inputs.gender = gender;
+            if (phoneNumber) inputs.phoneNumber = phoneNumber;
 
             const user = await User.findByIdAndUpdate(
                 { _id: req.userId },
                 inputs,
                 {
-                    new: true
+                    new: true,
+                    runValidators: true
                 }
             );
 

@@ -89,7 +89,7 @@ class ActivityController {
             if (tags) inputs.tags = tags;
 
             const activity = await Activity.findByIdAndUpdate(
-                req.userId,
+                req.params.id,
                 inputs
             );
 
@@ -101,7 +101,7 @@ class ActivityController {
 
     static async deleteOne(req, res, next) {
         try {
-            const activity = await Activity.findByIdAndDelete(req.userId);
+            const activity = await Activity.findByIdAndDelete(req.params.id);
             res.status(200).json({ activity });
         } catch (error) {
             next(error);

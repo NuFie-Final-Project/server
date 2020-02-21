@@ -5,9 +5,10 @@ const {
     activityAuthorization
 } = require("../middlewares/auth.js");
 
-// router.post("/", UserController.create);
-// router.post("/", UserController.register);
-router.post("/", UserController.registerWithGoogle);
+router.post("/register", UserController.register);
+router.post("/googleRegister", UserController.registerWithGoogle);
+router.post("/login", UserController.login);
+router.post("/googleLogin", UserController.loginWithGoogle);
 router.use(userAuthentication);
 router.get("/:id", UserController.readOne);
 router.patch("/", UserController.updateOne);

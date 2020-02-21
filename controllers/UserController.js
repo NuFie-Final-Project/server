@@ -16,12 +16,14 @@ class UserController {
             const {
                 firstName,
                 lastName,
-                profilePicture,
                 password,
                 gender,
                 interest,
                 phoneNumber
             } = req.body;
+
+            const profilePicture =
+                req.file && req.file.location ? req.file.location : "";
 
             const user = await User.create({
                 firstName,
@@ -174,7 +176,6 @@ class UserController {
             const {
                 firstName,
                 lastName,
-                profilePicture,
                 email,
                 password,
                 gender,
@@ -184,7 +185,8 @@ class UserController {
             const inputs = {};
             if (firstName) inputs.firstName = firstName;
             if (lastName) inputs.lastName = lastName;
-            if (profilePicture) inputs.lastName = profilePicture;
+            if (req.file && req.file.location)
+                inputs.profilePicture = req.file.location;
             if (email) inputs.email = email;
             if (password) inputs.password = password;
             if (gender) inputs.gender = gender;

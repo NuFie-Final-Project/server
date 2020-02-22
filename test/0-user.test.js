@@ -1,143 +1,110 @@
-const chai = require('chai');
-const chaiHttp = require('chai-http');
+const chai = require("chai");
+const chaiHttp = require("chai-http");
 const expect = chai.expect;
 
-const app = require('../app');
-const { removeAllActivity } = require('./helpers');
+const User = require("../models/User.js");
+const Activity = require("../models/Activity.js");
+
+const app = require("../app");
+const {
+    removeAllUser,
+    createUser,
+    createActivity,
+    removeAllActivity
+} = require("./helpers");
 
 chai.use(chaiHttp);
 
+const activityCreatorUser = {
+    firstName: "creator",
+    email: "creator@mail.com",
+    password: "asd123"
+};
 
-// isinya masih test activity
+const user1Data = {
+    firstName: "user1",
+    email: "user1@mail.com",
+    password: "asd123",
+    interests: ["javascript", "react"]
+};
 
+const user2Data = {
+    firstName: "user2",
+    email: "user2@mail.com",
+    password: "asd123",
+    interests: ["programming"]
+};
 
-describe('/activities', function() {
-  after(async function() {
-    await removeAllActivity();
-  })
+const activity1Data = {
+    title: "activity1",
+    description: "description1"
+};
 
-  describe('POST /activities', function() {
-    it('should create a new activity - (code: 201)', async function() {
-      const data = {
-        title: 'Bikin NuFie',
-        description: 'Coding NuFie di Hacktiv8',
-        image: 'sample.jpg', 
-        category: 'coding', 
-        memberLimit: 5, 
-        due_date: '2020-02-25', 
-        location: 'Pondok Indah', 
-        address: 'Jl. Sultan Iskandar Muda', 
-        tags: ['final', 'project'], 
-        status: 'open', 
-        isPromo: false        
-      };
-      const response = await chai
-        .request(app)
-        .post('/activities')
-        .send(data);
+let createdUser0, createdUser1, createdUser2;
+let createdActivity1;
 
-      expect(response).to.have.status(201);
-      expect(response.body).to.be.an('object');
-      expect(response.body).to.have.property('activity');
-      expect(response.body.activity).to.have.property('_id');
-      expect(response.body.activity).to.have.property('createdAt');
-      expect(response.body.activity).to.have.property('updatedAt');
+describe.only("/user", function() {
+    before(async function() {
+        createdUser0 = await createUser(activityCreatorUser);
+        createdUser1 = await createUser(user1Data);
+        createdUser2 = await createUser(user2Data);
 
-      expect(response.body.activity).to.have.property('members');
-      expect(response.body.activity).to.have.property('pendingInvites');
-      expect(response.body.activity).to.have.property('pendingJoins');
+        // createdActivity1 = await Activity.create({
+        //     owner: createdUser0._id,
+        //     title: activity1Data.title,
+        //     description: activity1Data.description,
+        //     tags: JSON.stringify(["react", "vue", "javascript"])
+        // });
 
-      expect(response.body.activity.members.length).to.equal(0);
-      expect(response.body.activity.pendingInvites.length).to.equal(0);
-      expect(response.body.activity.pendingJoins.length).to.equal(0);
-
-      expect(response.body.activity).to.have.property('title');
-      expect(response.body.activity).to.have.property('description');
-      expect(response.body.activity).to.have.property('image');
-      expect(response.body.activity).to.have.property('category');
-      expect(response.body.activity).to.have.property('memberLimit');
-      expect(response.body.activity).to.have.property('due_date');
-      expect(response.body.activity).to.have.property('location');
-      expect(response.body.activity).to.have.property('address');
-      expect(response.body.activity).to.have.property('tags');
-      expect(response.body.activity).to.have.property('status');
-      expect(response.body.activity).to.have.property('isPromo');
-
-      expect(response.body.activity.title).to.equal(data.title);
-      expect(response.body.activity.description).to.equal(data.description);
-      expect(response.body.activity.image).to.equal(data.image);
-      expect(response.body.activity.category).to.equal(data.category);
-      expect(response.body.activity.memberLimit).to.equal(data.memberLimit);
-      expect(response.body.activity.due_date).to.includes(data.due_date);
-      expect(response.body.activity.location).to.equal(data.location);
-      expect(response.body.activity.address).to.equal(data.address);
-      expect(response.body.activity.tags[0]).to.equal(data.tags[0]);
-      expect(response.body.activity.tags[1]).to.equal(data.tags[1]);
-      expect(response.body.activity.status).to.equal(data.status);
-      expect(response.body.activity.isPromo).to.equal(data.isPromo);
+        // createdActivity1 = tempActivityResp.activity._id;
     });
 
-    it('should send errors - (Empty body, code: 400)', async function() {
-      const data = {};
-      const response = await chai
-        .request(app)
-        .post('/activities')
-        .send(data);
-
-      expect(response).to.have.status(400);
-      expect(response.body).to.be.an('object');
-      expect(response.body).to.have.property('message');
-      expect(response.body.message[0]).to.equal('Title is required')
-      expect(response.body.message[1]).to.equal('Description is required')
-      //tambah validation2 yg lain
+    after(async function() {
+        await removeAllUser();
+        await removeAllActivity();
     });
-  });
 
-  describe('GET /activities', function() {
-    it('should get all activity - (code: 200)', async function() {
-      const response = await chai
-        .request(app)
-        .get('/activities')
-      console.log(response.body)
-      expect(response).to.have.status(201);
-      expect(response.body).to.be.an('object');
-      expect(response.body).to.have.property('activity');
-      expect(response.body.activity).to.have.property('_id');
-      expect(response.body.activity).to.have.property('createdAt');
-      expect(response.body.activity).to.have.property('updatedAt');
+    describe("Edit user profile: PATCH /users/:id", function() {
+        it("should return a modified user object - status code 200", async function() {
+            const updateData = {
+                lastName: "Bond"
+            };
 
-      expect(response.body.activity).to.have.property('members');
-      expect(response.body.activity).to.have.property('pendingInvites');
-      expect(response.body.activity).to.have.property('pendingJoins');
+            const response = await chai
+                .request(app)
+                .patch("/users")
+                .set({
+                    token: createdUser1.token
+                })
+                .send(updateData);
 
-      expect(response.body.activity.members.length).to.equal(0);
-      expect(response.body.activity.pendingInvites.length).to.equal(0);
-      expect(response.body.activity.pendingJoins.length).to.equal(0);
-
-      expect(response.body.activity).to.have.property('title');
-      expect(response.body.activity).to.have.property('description');
-      expect(response.body.activity).to.have.property('image');
-      expect(response.body.activity).to.have.property('category');
-      expect(response.body.activity).to.have.property('memberLimit');
-      expect(response.body.activity).to.have.property('due_date');
-      expect(response.body.activity).to.have.property('location');
-      expect(response.body.activity).to.have.property('address');
-      expect(response.body.activity).to.have.property('tags');
-      expect(response.body.activity).to.have.property('status');
-      expect(response.body.activity).to.have.property('isPromo');
-
-      expect(response.body.activity.title).to.equal(data.title);
-      expect(response.body.activity.description).to.equal(data.description);
-      expect(response.body.activity.image).to.equal(data.image);
-      expect(response.body.activity.category).to.equal(data.category);
-      expect(response.body.activity.memberLimit).to.equal(data.memberLimit);
-      expect(response.body.activity.due_date).to.includes(data.due_date);
-      expect(response.body.activity.location).to.equal(data.location);
-      expect(response.body.activity.address).to.equal(data.address);
-      expect(response.body.activity.tags[0]).to.equal(data.tags[0]);
-      expect(response.body.activity.tags[1]).to.equal(data.tags[1]);
-      expect(response.body.activity.status).to.equal(data.status);
-      expect(response.body.activity.isPromo).to.equal(data.isPromo);
+            expect(response).to.have.status(200);
+            expect(response.body.user.lastName).to.equal("Bond");
+        });
     });
-  });  
+
+    describe("Get self detail: GET /users/:id", function() {
+        it("Return a user object with the post populated - status 200", async function() {
+            const activityResp = await chai
+                .request(app)
+                .post("/activities")
+                .set({
+                    token: createdUser0.token
+                })
+                .send(activity1Data);
+
+            const activity = activityResp.body.activity;
+
+            const response = await chai
+                .request(app)
+                .get("/users")
+                .set({
+                    token: createdUser0.token
+                });
+
+            // console.log(response.body.user.posts[0], "isi body");
+            expect(response).to.have.status(200);
+            expect(response.body.user.posts[0]).to.equal(activity._id);
+        });
+    });
 });

@@ -2,6 +2,7 @@ const User = require("../models/User.js");
 const admin = require("../services/firebase-admin");
 const { OAuth2Client } = require("google-auth-library");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 
 class UserController {
     static async signIn(req, res, next) {
@@ -17,9 +18,13 @@ class UserController {
                 lastName,
                 password,
                 gender,
-                interest,
                 phoneNumber
             } = req.body;
+
+            const interests =
+                req.body && req.body.interests
+                    ? JSON.parse(req.body.interests)
+                    : null;
 
             const inputs = {};
             let user;
@@ -43,7 +48,7 @@ class UserController {
                     email,
                     password,
                     gender,
-                    interest,
+                    interests,
                     phoneNumber
                 });
 
@@ -240,13 +245,21 @@ class UserController {
 
     static async getByMostMatchingInterests(req, res, next) {
         try {
+            const tags = req.body && req.body.tags ? req.body.tags : [];
             const users = await User.aggregate([
                 {
                     $addFields: {
                         weight: {
                             $size: {
-                                $setIntersection: ["$interests", req.body.tags]
+                                $setIntersection: ["$interests", tags]
                             }
+                        }
+                    }
+                },
+                {
+                    $match: {
+                        _id: {
+                            $ne: mongoose.Types.ObjectId(req.userId)
                         }
                     }
                 },
@@ -257,7 +270,7 @@ class UserController {
                 }
             ]);
 
-            res.status(200).json({ users });
+            res.status(200).json({ users, userId: req.userId });
         } catch (error) {
             next(error);
         }
@@ -268,10 +281,10 @@ class UserController {
             const {
                 firstName,
                 lastName,
-                email,
                 password,
                 gender,
-                phoneNumber
+                phoneNumber,
+                aboutMe
             } = req.body;
 
             const interests =
@@ -284,11 +297,11 @@ class UserController {
             if (lastName) inputs.lastName = lastName;
             if (req.file && req.file.location)
                 inputs.profilePicture = req.file.location;
-            if (email) inputs.email = email;
             if (password) inputs.password = password;
             if (gender) inputs.gender = gender;
             if (phoneNumber) inputs.phoneNumber = phoneNumber;
             if (interests) inputs.interests = interests;
+            if (aboutMe) inputs.aboutMe = aboutMe;
 
             const user = await User.findByIdAndUpdate(
                 { _id: req.userId },

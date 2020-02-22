@@ -16,7 +16,8 @@ const userSchema = new Schema({
         type: String
     },
     aboutMe: {
-        type: String
+        type: String,
+        default: ""
     },
     gender: {
         type: String

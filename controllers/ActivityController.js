@@ -56,6 +56,20 @@ class ActivityController {
         }
     }
 
+    static async getByCategory(req, res, next) {
+        try {
+            const limit = req.query && req.query.limit ? req.query.limit : 10;
+            const page = req.query && req.query.page ? req.query.page : 1;
+            const activities = await Activity.find({ category: req.params.category })
+                .limit(limit)
+                .skip(limit * (page - 1));
+
+            res.status(200).json({ activities });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     static async readOne(req, res, next) {
         try {
             const activity = await Activity.findById(req.userId);

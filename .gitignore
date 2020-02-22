@@ -2,3 +2,4 @@ node_modules
 NUFie_firebase_key.json
 firebase_config.js
 .nyc_output
+.env

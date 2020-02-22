@@ -72,7 +72,10 @@ class ActivityController {
 
     static async readOne(req, res, next) {
         try {
-            const activity = await Activity.findById(req.userId);
+            const activity = await Activity.findById(req.params.id)
+                .populate("owner", "-password -posts")
+                .populate("pendingInvites", "-password -posts");
+
             res.status(200).json({ activity });
         } catch (error) {
             next(error);
@@ -110,7 +113,10 @@ class ActivityController {
 
             const activity = await Activity.findByIdAndUpdate(
                 req.params.id,
-                inputs
+                inputs,
+                {
+                    new: true
+                }
             );
 
             res.status(200).json({ activity });
@@ -130,7 +136,7 @@ class ActivityController {
 
     static async commit(req, res, next) {
         try {
-            const status = 'commit'
+            const status = "commit";
             const activity = await Activity.findByIdAndUpdate(
                 req.params.id,
                 { status },
@@ -144,10 +150,22 @@ class ActivityController {
 
     static async invite(req, res, next) {
         try {
-            const { invitedMemberId } = req.body
-            const activity = await Activity.findByIdAndUpdate(
+            const { targetId } = req.body;
+
+            let activity = await Activity.findOne({
+                members: targetId
+            });
+
+            if (activity)
+                throw {
+                    errorCode: 400,
+                    message:
+                        "You already have invited this user to this activity"
+                };
+
+            activity = await Activity.findByIdAndUpdate(
                 req.params.id,
-                { $addToSet: { pendingInvites: invitedMemberId } },
+                { $addToSet: { pendingInvites: targetId } },
                 { new: true }
             );
             res.status(200).json({ activity });
@@ -160,7 +178,7 @@ class ActivityController {
         try {
             const activity = await Activity.findByIdAndUpdate(
                 req.params.id,
-                { 
+                {
                     $addToSet: { members: req.userId },
                     $pull: { pendingInvites: req.userId }
                 },
@@ -187,10 +205,10 @@ class ActivityController {
 
     static async kick(req, res, next) {
         try {
-            const { kickedMemberId } = req.body
+            const { targetId } = req.body;
             const activity = await Activity.findByIdAndUpdate(
                 req.params.id,
-                { $pull: { members: kickedMemberId } },
+                { $pull: { members: targetId } },
                 { new: true }
             );
             res.status(200).json({ activity });
@@ -214,14 +232,29 @@ class ActivityController {
 
     static async joinAccept(req, res, next) {
         try {
-            const activity = await Activity.findByIdAndUpdate(
+            const { targetId } = req.body;
+
+            let activity = await Activity.findOne({
+                _id: req.params.id,
+                pendingJoins: targetId
+            });
+
+            if (!activity)
+                throw {
+                    errorCode: 400,
+                    message:
+                        "The user you want to accept is not in pending join"
+                };
+
+            activity = await Activity.findByIdAndUpdate(
                 req.params.id,
-                { 
-                    $addToSet: { members: req.userId },
-                    $pull: { pendingJoins: req.userId }
+                {
+                    $addToSet: { members: targetId },
+                    $pull: { pendingJoins: targetId }
                 },
                 { new: true }
             );
+
             res.status(200).json({ activity });
         } catch (error) {
             next(error);
@@ -230,11 +263,18 @@ class ActivityController {
 
     static async joinReject(req, res, next) {
         try {
+            const { targetId } = req.body;
+
             const activity = await Activity.findByIdAndUpdate(
                 req.params.id,
-                { $pull: { pendingJoins: req.userId } },
+                {
+                    $pull: {
+                        pendingJoins: targetId
+                    }
+                },
                 { new: true }
             );
+
             res.status(200).json({ activity });
         } catch (error) {
             next(error);

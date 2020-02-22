@@ -4,6 +4,64 @@ const { OAuth2Client } = require("google-auth-library");
 const jwt = require("jsonwebtoken");
 
 class UserController {
+    static async signIn(req, res, next) {
+        try {
+            const decodedToken = await admin
+                .auth()
+                .verifyIdToken(req.body.idToken);
+
+            const email = decodedToken.email;
+
+            const {
+                firstName,
+                lastName,
+                password,
+                gender,
+                interest,
+                phoneNumber
+            } = req.body;
+
+            const inputs = {};
+            let user;
+            let statusCode;
+
+            if (!firstName) {
+                // login
+
+                user = await User.findOne({ email });
+                statusCode = 200;
+            } else {
+                // register
+
+                const profilePicture =
+                    req.file && req.file.location ? req.file.location : "";
+
+                user = await User.create({
+                    firstName,
+                    lastName,
+                    profilePicture,
+                    email,
+                    password,
+                    gender,
+                    interest,
+                    phoneNumber
+                });
+
+                statusCode = 201;
+            }
+
+            const payload = {
+                userId: user._id
+            };
+
+            const token = jwt.sign(payload, process.env.JWT_SECRET);
+
+            res.status(statusCode).json({ token, userId: user._id });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     static async register(req, res, next) {
         try {
             const decodedToken = await admin

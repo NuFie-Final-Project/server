@@ -1,4 +1,5 @@
 const Activity = require("../models/Activity.js");
+const User = require("../models/User.js");
 
 class ActivityController {
     static async create(req, res, next) {
@@ -35,6 +36,15 @@ class ActivityController {
                 isPromo
             });
 
+            await User.updateOne(
+                { _id: req.userId },
+                {
+                    $push: {
+                        posts: activity._id
+                    }
+                }
+            );
+
             res.status(201).json({ activity });
         } catch (error) {
             next(error);
@@ -60,7 +70,9 @@ class ActivityController {
         try {
             const limit = req.query && req.query.limit ? req.query.limit : 10;
             const page = req.query && req.query.page ? req.query.page : 1;
-            const activities = await Activity.find({ category: req.params.category })
+            const activities = await Activity.find({
+                category: req.params.category
+            })
                 .limit(limit)
                 .skip(limit * (page - 1));
 
@@ -74,7 +86,9 @@ class ActivityController {
         try {
             const activity = await Activity.findById(req.params.id)
                 .populate("owner", "-password -posts")
-                .populate("pendingInvites", "-password -posts");
+                .populate("members", "-password -posts")
+                .populate("pendingInvites", "-password -posts")
+                .populate("pendingJoins", "-password -posts");
 
             res.status(200).json({ activity });
         } catch (error) {

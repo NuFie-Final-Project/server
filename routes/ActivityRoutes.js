@@ -11,6 +11,7 @@ const { singleUpload } = require("../services/imageUpload");
 router.use(userAuthentication);
 router.post("/", singleUpload, ActivityController.create);
 router.get("/", ActivityController.read);
+router.get("/category/:category", ActivityController.getByCategory);
 router.get("/:id", ActivityController.readOne);
 router.patch(
     "/:id",
@@ -27,7 +28,6 @@ router.post("/join/:id", ActivityController.join);
 router.post("/joinAccept/:id", activityAuthorization, ActivityController.joinAccept);
 router.post("/joinReject/:id", activityAuthorization, ActivityController.joinReject);
 router.post("/leave/:id", activityMemberAuthorization, ActivityController.leave);
-router.patch("/:id", activityAuthorization, ActivityController.updateOne);
 router.delete("/:id", activityAuthorization, ActivityController.deleteOne);
 
 module.exports = router;

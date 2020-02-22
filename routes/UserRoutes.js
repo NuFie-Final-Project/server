@@ -6,6 +6,7 @@ const {
 } = require("../middlewares/auth.js");
 const { singleUpload } = require("../services/imageUpload");
 
+router.post("/signIn", UserController.signIn);
 router.post("/register", UserController.register);
 router.post("/googleRegister", UserController.registerWithGoogle);
 router.post("/login", UserController.login);

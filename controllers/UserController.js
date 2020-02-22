@@ -162,10 +162,45 @@ class UserController {
         }
     }
 
+    // To fetch other's profile
     static async readOne(req, res, next) {
         try {
-            const user = await User.findOne({ _id: req.userId });
+            const user = await User.findById(req.params.id);
             res.status(200).json({ user });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async readSelf(req, res, next) {
+        try {
+            const user = await User.findById(req.userId);
+            res.status(200).json({ user });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getByMostMatchingInterests(req, res, next) {
+        try {
+            const users = await User.aggregate([
+                {
+                    $addFields: {
+                        weight: {
+                            $size: {
+                                $setIntersection: ["$interests", req.body.tags]
+                            }
+                        }
+                    }
+                },
+                {
+                    $sort: {
+                        weight: -1
+                    }
+                }
+            ]);
+
+            res.status(200).json({ users });
         } catch (error) {
             next(error);
         }
@@ -182,6 +217,11 @@ class UserController {
                 phoneNumber
             } = req.body;
 
+            const interests =
+                req.body && req.body.interests
+                    ? JSON.parse(req.body.interests)
+                    : null;
+
             const inputs = {};
             if (firstName) inputs.firstName = firstName;
             if (lastName) inputs.lastName = lastName;
@@ -191,6 +231,7 @@ class UserController {
             if (password) inputs.password = password;
             if (gender) inputs.gender = gender;
             if (phoneNumber) inputs.phoneNumber = phoneNumber;
+            if (interests) inputs.interests = interests;
 
             const user = await User.findByIdAndUpdate(
                 { _id: req.userId },

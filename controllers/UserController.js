@@ -2,7 +2,6 @@ const User = require("../models/User.js");
 const admin = require("../services/firebase-admin");
 const { OAuth2Client } = require("google-auth-library");
 const jwt = require("jsonwebtoken");
-const { comparePassword } = require("../helpers/bcrypt");
 
 class UserController {
     static async register(req, res, next) {
@@ -42,7 +41,7 @@ class UserController {
 
             const token = jwt.sign(payload, process.env.JWT_SECRET);
 
-            res.status(201).json({ token });
+            res.status(201).json({ token, userId: user._id });
         } catch (error) {
             next(error);
         }
@@ -80,7 +79,7 @@ class UserController {
 
             const token = jwt.sign(jwtPayload, process.env.JWT_SECRET);
 
-            res.status(201).json({ token });
+            res.status(201).json({ token, userId: user._id });
         } catch (error) {
             next(error);
         }
@@ -99,7 +98,7 @@ class UserController {
             };
 
             const token = jwt.sign(payload, process.env.JWT_SECRET);
-            res.status(200).json({ token });
+            res.status(200).json({ token, user: user._id });
         } catch (error) {
             next(error);
         }
@@ -128,7 +127,7 @@ class UserController {
             };
 
             const token = jwt.sign(tokenPayload, process.env.JWT_SECRET);
-            res.status(200).json({ token });
+            res.status(200).json({ token, user: user._id });
         } catch (error) {
             next(error);
         }

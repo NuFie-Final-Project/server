@@ -27,7 +27,8 @@ async function activityAuthorization(req, res, next) {
         if (!activity)
             throw {
                 errorCode: 401,
-                message: "Activity authorization failed"
+                message:
+                    "Activity authorization failed / activity cannot be found"
             };
 
         next();
@@ -59,7 +60,7 @@ async function activityPendingAuthorization(req, res, next) {
     try {
         const activity = await Activity.findOne({
             _id: req.params.id,
-            pendingJoins: req.userId
+            pendingInvites: req.userId
         });
 
         if (!activity)

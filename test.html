@@ -18,7 +18,13 @@
         <form id="test">
             <input type="text" id="email" placeholder="email" />
             <input type="password" id="password" placeholder="password" />
-            <input type="submit" />
+            <input type="submit" value='register'/>
+        </form>
+
+        <form id="test2">
+            <input type="text" id="email2" placeholder="email" />
+            <input type="password" id="password2" placeholder="password" />
+            <input type="submit" value='login'/>
         </form>
 
         <div class="g-signin2" data-onsuccess="onSignIn"></div>
@@ -59,7 +65,7 @@
                             .auth()
                             .currentUser.getIdToken(/* forceRefresh */ true)
                             .then((idToken) => {
-                                // console.log(idToken);
+                                console.log(idToken);
                             })
                             .catch((error) => {
                                 console.log(error);
@@ -76,6 +82,14 @@
                     firebase
                         .auth()
                         .createUserWithEmailAndPassword(email, password);
+                });
+                $("#test2").submit(function(e) {
+                    e.preventDefault();
+                    const email = $("#email2").val();
+                    const password = $("#password2").val();
+                    firebase
+                        .auth()
+                        .signInWithEmailAndPassword(email, password);
                 });
             });
 

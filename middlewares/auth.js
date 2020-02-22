@@ -36,7 +36,47 @@ async function activityAuthorization(req, res, next) {
     }
 }
 
+async function activityMemberAuthorization(req, res, next) {
+    try {
+        const activity = await Activity.findOne({
+            _id: req.params.id,
+            members: req.userId
+        });
+
+        if (!activity)
+            throw {
+                errorCode: 401,
+                message: "Activity authorization failed"
+            };
+
+        next();
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function activityPendingAuthorization(req, res, next) {
+    try {
+        const activity = await Activity.findOne({
+            _id: req.params.id,
+            pendingJoins: req.userId
+        });
+
+        if (!activity)
+            throw {
+                errorCode: 401,
+                message: "Activity authorization failed"
+            };
+
+        next();
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     userAuthentication,
-    activityAuthorization
+    activityAuthorization,
+    activityMemberAuthorization,
+    activityPendingAuthorization
 };

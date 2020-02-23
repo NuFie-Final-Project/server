@@ -52,8 +52,8 @@ class ActivityController {
 
 	static async read(req, res, next) {
 		try {
-			const limit = req.query && req.query.limit ? req.query.limit : 10;
-			const page = req.query && req.query.page ? req.query.page : 1;
+			const limit = req.query && req.query.limit ? +req.query.limit : 10;
+			const page = req.query && req.query.page ? +req.query.page : 1;
 
 			const activities = await Activity.find().limit(limit).skip(limit * (page - 1));
 
@@ -65,8 +65,8 @@ class ActivityController {
 
 	static async getByInterest(req, res, next) {
 		try {
-			const limit = req.query && req.query.limit ? req.query.limit : 10;
-			const page = req.query && req.query.page ? req.query.page : 1;
+			const limit = req.query && req.query.limit ? +req.query.limit : 10;
+			const page = req.query && req.query.page ? +req.query.page : 1;
 			const interest = req.params && req.params.interest ? req.params.interest : 'other';
 
 			const activities = await Activity.find({ tags: interest }).limit(limit).skip(limit * (page - 1));
@@ -78,8 +78,8 @@ class ActivityController {
 
 	static async getByCategory(req, res, next) {
 		try {
-			const limit = req.query && req.query.limit ? req.query.limit : 10;
-			const page = req.query && req.query.page ? req.query.page : 1;
+			const limit = req.query && req.query.limit ? +req.query.limit : 10;
+			const page = req.query && req.query.page ? +req.query.page : 1;
 			const activities = await Activity.find({
 				category: req.params.category
 			})

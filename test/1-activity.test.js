@@ -27,8 +27,10 @@ describe('/activities', function() {
 				status: 'open',
 				isPromo: false
 			};
-			const response = await chai.request(app).post('/activities')// .set('token', '')
-			.send(data);
+			const response = await chai
+				.request(app)
+				.post('/activities') // .set('token', '')
+				.send(data);
 
 			expect(response).to.have.status(201);
 			expect(response.body).to.be.an('object');

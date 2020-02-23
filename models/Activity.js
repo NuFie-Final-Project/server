@@ -23,7 +23,8 @@ const activitySchema = new Schema({
         type: String
     },
     category: {
-        type: String
+        type: String,
+        default: 'other'
     },
     members: [
         {

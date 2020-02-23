@@ -167,6 +167,35 @@ describe('/activities', function() {
 			status: 'open',
 			isPromo: false
 		};
+
+		const activityCreatorUser = {
+			firstName: 'creator',
+			email: 'creator@mail.com',
+			password: 'asd123'
+		};
+
+		const user1Data = {
+			firstName: 'user1',
+			email: 'user1@mail.com',
+			password: 'asd123',
+			interests: [ 'javascript', 'react' ]
+		};
+
+		const user2Data = {
+			firstName: 'user2',
+			email: 'user2@mail.com',
+			password: 'asd123',
+			interests: [ 'programming' ]
+		};
+
+		const activity1Data = {
+			title: 'activity1',
+			description: 'description1'
+		};
+
+		let createdUser0, createdUser1, createdUser2;
+		let myActivity1;
+
 		before(async function() {
 			//blm tau cara create user dengan token dinamis, ini langsung create di DB
 			let userData = {
@@ -181,11 +210,19 @@ describe('/activities', function() {
 			};
 			let data = await createUser(userData);
 			token = data.token;
+
+			createdUser0 = await createUser(activityCreatorUser);
+			createdUser1 = await createUser(user1Data);
+			createdUser2 = await createUser(user2Data);
 		});
 
 		after(async function() {
 			await removeAllActivity();
 			await removeAllUser();
+		});
+
+		describe('Invite people to an activity: POST /activities/invite/:id', function() {
+			it('Should return an updated activity object with the target user id inside pendingInvites array - status -200', async function() {});
 		});
 
 		describe('POST /activities', function() {

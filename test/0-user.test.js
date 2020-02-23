@@ -102,5 +102,5 @@ describe('/user', function() {
 		});
 	});
 
-	describe('Get');
+	// describe('Get');
 });

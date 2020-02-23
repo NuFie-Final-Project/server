@@ -13,12 +13,12 @@ class ActivityController {
 				due_date,
 				location,
 				address,
-				tags,
 				status,
 				isPromo
 			} = req.body;
 
 			const image = req.file && req.file.location ? req.file.location : '';
+			const tags = req.body && req.body.tags && req.body.tags != '[]' ? JSON.parse(req.body.tags) : [];
 
 			const activity = await Activity.create({
 				owner,
@@ -108,20 +108,10 @@ class ActivityController {
 
 	static async updateOne(req, res, next) {
 		try {
-			const {
-				title,
-				description,
-				category,
-				memberLimit,
-				due_date,
-				location,
-				address,
-				tags,
-				status,
-				isPromo
-			} = req.body;
+			const { title, description, category, memberLimit, due_date, location, address, isPromo } = req.body;
 
 			const image = req.file && req.file.location ? req.file.location : null;
+			const tags = req.body && req.body.tags && req.body.tags != '[]' ? req.body.tags : null;
 
 			const inputs = {};
 			if (title) inputs.title = title;

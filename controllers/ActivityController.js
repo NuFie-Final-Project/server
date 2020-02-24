@@ -55,7 +55,7 @@ class ActivityController {
 			const limit = req.query && req.query.limit ? +req.query.limit : 10;
 			const page = req.query && req.query.page ? +req.query.page : 1;
 
-			const activities = await Activity.find().limit(limit).skip(limit * (page - 1));
+			const activities = await Activity.find().limit(limit).skip(limit * (page - 1)).populate('owner', '-password -posts');
 
 			res.status(200).json({ activities });
 		} catch (error) {

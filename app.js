@@ -12,7 +12,8 @@ const mongodbConnectionStr = `mongodb://localhost:27017/nufie-${process.env.NODE
 mongoose.connect(mongodbConnectionStr, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useCreateIndex: true
+    useCreateIndex: true,
+    useFindAndModify: false
 });
 
 app.use(cors());

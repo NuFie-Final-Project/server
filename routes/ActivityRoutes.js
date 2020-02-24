@@ -16,6 +16,7 @@ router.get('/interest/:interest', ActivityController.getByInterest);
 router.get('/:id', ActivityController.readOne);
 router.patch('/:id', activityAuthorization, singleUpload, ActivityController.updateOne);
 router.post('/commit/:id', activityAuthorization, ActivityController.commit);
+router.patch('/cancel/:id', activityAuthorization, ActivityController.cancel);
 router.post('/invite/:id', activityAuthorization, ActivityController.invite);
 router.post('/inviteAccept/:id', activityPendingAuthorization, ActivityController.inviteAccept);
 router.post('/inviteReject/:id', activityPendingAuthorization, ActivityController.inviteReject);

@@ -55,7 +55,10 @@ class ActivityController {
 			const limit = req.query && req.query.limit ? +req.query.limit : 10;
 			const page = req.query && req.query.page ? +req.query.page : 1;
 
-			const activities = await Activity.find().limit(limit).skip(limit * (page - 1)).populate('owner', '-password -posts');
+			const activities = await Activity.find()
+				.limit(limit)
+				.skip(limit * (page - 1))
+				.populate('owner', '-password -posts');
 
 			res.status(200).json({ activities });
 		} catch (error) {
@@ -147,6 +150,15 @@ class ActivityController {
 		try {
 			const status = 'commit';
 			const activity = await Activity.findByIdAndUpdate(req.params.id, { status }, { new: true });
+			res.status(200).json({ activity });
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	static async cancel(req, res, next) {
+		try {
+			const activity = await Activity.findByIdAndUpdate(req.params.id, { status: 'cancelled' }, { new: true });
 			res.status(200).json({ activity });
 		} catch (error) {
 			next(error);

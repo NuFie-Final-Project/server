@@ -1,5 +1,6 @@
 const Activity = require("../models/Activity.js");
 const User = require("../models/User.js");
+const axios = require('axios')
 
 class ActivityController {
     static async create(req, res, next) {
@@ -8,7 +9,6 @@ class ActivityController {
             const {
                 title,
                 description,
-                category,
                 memberLimit,
                 due_date,
                 location,
@@ -29,7 +29,6 @@ class ActivityController {
                 title,
                 description,
                 image,
-                category,
                 memberLimit,
                 due_date,
                 location,
@@ -88,22 +87,6 @@ class ActivityController {
         }
     }
 
-    static async getByCategory(req, res, next) {
-        try {
-            const limit = req.query && req.query.limit ? +req.query.limit : 10;
-            const page = req.query && req.query.page ? +req.query.page : 1;
-            const activities = await Activity.find({
-                category: req.params.category
-            })
-                .limit(limit)
-                .skip(limit * (page - 1));
-
-            res.status(200).json({ activities });
-        } catch (error) {
-            next(error);
-        }
-    }
-
     static async readOne(req, res, next) {
         try {
             const activity = await Activity.findById(req.params.id)
@@ -123,7 +106,6 @@ class ActivityController {
             const {
                 title,
                 description,
-                category,
                 memberLimit,
                 due_date,
                 location,
@@ -142,7 +124,6 @@ class ActivityController {
             if (title) inputs.title = title;
             if (description) inputs.description = description;
             if (image) inputs.image = image;
-            if (category) inputs.category = category;
             if (memberLimit) inputs.memberLimit = memberLimit;
             if (due_date) inputs.due_date = due_date;
             if (location) inputs.location = location;
@@ -382,6 +363,23 @@ class ActivityController {
                 { $pull: { members: targetId } },
                 { new: true }
             );
+
+            const { pushToken } = req.body;
+
+            axios.post(
+                `https://exp.host/--/api/v2/push/send`,
+                {
+                    to: `ExponentPushToken[${pushToken}]`,
+                    title: `You have been kicked from "${activity.title}"`
+                },
+                {
+                    host: "exp.host",
+                    accept: "application/json",
+                    "accept-encoding": "gzip, deflate",
+                    "content-type": "application/json"
+                }
+            );
+
             res.status(200).json({ activity });
         } catch (error) {
             next(error);
@@ -394,6 +392,23 @@ class ActivityController {
                 req.params.id,
                 { $addToSet: { pendingJoins: req.userId } },
                 { new: true }
+            );
+
+            const user = await User.findById(req.userId).select('firstName lastName')
+            const { pushToken } = req.body;
+
+            axios.post(
+                `https://exp.host/--/api/v2/push/send`,
+                {
+                    to: `ExponentPushToken[${activity.owner.pushToken}]`,
+                    title: `${user.firstName} ${user.lastName} is requesting to join "${activity.title}"`
+                },
+                {
+                    host: "exp.host",
+                    accept: "application/json",
+                    "accept-encoding": "gzip, deflate",
+                    "content-type": "application/json"
+                }
             );
             res.status(200).json({ activity });
         } catch (error) {
@@ -425,7 +440,21 @@ class ActivityController {
                 },
                 { new: true }
             );
+            const { pushToken } = req.body;
 
+            axios.post(
+                `https://exp.host/--/api/v2/push/send`,
+                {
+                    to: `ExponentPushToken[${pushToken}]`,
+                    title: `You have been accepted to join "${activity.title}"`
+                },
+                {
+                    host: "exp.host",
+                    accept: "application/json",
+                    "accept-encoding": "gzip, deflate",
+                    "content-type": "application/json"
+                }
+            );
             res.status(200).json({ activity });
         } catch (error) {
             next(error);
@@ -445,7 +474,21 @@ class ActivityController {
                 },
                 { new: true }
             );
+            const { pushToken } = req.body;
 
+            axios.post(
+                `https://exp.host/--/api/v2/push/send`,
+                {
+                    to: `ExponentPushToken[${pushToken}]`,
+                    title: `You have been rejected to join "${activity.title}"`
+                },
+                {
+                    host: "exp.host",
+                    accept: "application/json",
+                    "accept-encoding": "gzip, deflate",
+                    "content-type": "application/json"
+                }
+            );
             res.status(200).json({ activity });
         } catch (error) {
             next(error);
@@ -458,6 +501,22 @@ class ActivityController {
                 req.params.id,
                 { $pull: { members: req.userId } },
                 { new: true }
+            );
+            const user = await User.findById(req.userId).select('firstName lastName')
+            const { pushToken } = req.body;
+
+            axios.post(
+                `https://exp.host/--/api/v2/push/send`,
+                {
+                    to: `ExponentPushToken[${activity.owner.pushToken}]`,
+                    title: `${user.firstName} ${user.lastName} has leave "${activity.title}"`
+                },
+                {
+                    host: "exp.host",
+                    accept: "application/json",
+                    "accept-encoding": "gzip, deflate",
+                    "content-type": "application/json"
+                }
             );
             res.status(200).json({ activity });
         } catch (error) {

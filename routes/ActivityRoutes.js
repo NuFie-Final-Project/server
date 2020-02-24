@@ -11,7 +11,6 @@ const { singleUpload } = require("../services/imageUpload");
 router.use(userAuthentication);
 router.post("/", singleUpload, ActivityController.create);
 router.get("/", ActivityController.read);
-router.get("/category/:category", ActivityController.getByCategory);
 router.get("/interest/:interest", ActivityController.getByInterest);
 router.get("/:id", ActivityController.readOne);
 router.patch(

@@ -3,6 +3,7 @@ const admin = require("../services/firebase-admin");
 const { OAuth2Client } = require("google-auth-library");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
+const axios = require("axios");
 
 class UserController {
     static async signIn(req, res, next) {
@@ -24,7 +25,7 @@ class UserController {
             const interests =
                 req.body && req.body.interests
                     ? JSON.parse(req.body.interests)
-                    : null;
+                    : [];
 
             const inputs = {};
             let user;
@@ -62,6 +63,36 @@ class UserController {
             const token = jwt.sign(payload, process.env.JWT_SECRET);
 
             res.status(statusCode).json({ token, userId: user._id });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async savePushToken(req, res, next) {
+        try {
+            const { pushToken, userId } = req.body;
+            const user = await User.findByIdAndUpdate(
+                userId,
+                { pushToken },
+                { new: true }
+            );
+
+            axios.post(
+                `https://exp.host/--/api/v2/push/send`,
+                {
+                    to: `ExponentPushToken[${pushToken}]`,
+                    title: "testing",
+                    body: "this is body"
+                },
+                {
+                    host: "exp.host",
+                    accept: "application/json",
+                    "accept-encoding": "gzip, deflate",
+                    "content-type": "application/json"
+                }
+            );
+
+            res.status(200).json({ user });
         } catch (error) {
             next(error);
         }

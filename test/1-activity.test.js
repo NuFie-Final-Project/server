@@ -19,7 +19,6 @@ chai.use(chaiHttp);
 			title: 'Coldplay',
 			description: 'Nonton konser Coldplay',
 			image: '',
-			// category: 'music',
 			memberLimit: 10,
 			due_date: '2020-02-25',
 			location: 'BSD',
@@ -33,7 +32,6 @@ chai.use(chaiHttp);
 			title: 'Star Wars',
 			description: 'Nonton Star Wars di bioskop',
 			image: '',
-			// category: 'movie',
 			memberLimit: 5,
 			due_date: '2020-02-27',
 			location: 'Pondok Indah',
@@ -72,7 +70,6 @@ chai.use(chaiHttp);
 		let myActivity1;
 
 		before(async function() {
-			//blm tau cara create user dengan token dinamis, ini langsung create di DB
 			let userData = {
 				firstName: 'John',
 				lastName: 'Doe',
@@ -114,7 +111,6 @@ chai.use(chaiHttp);
 				expect(response.body.activity.title).to.equal(activity1.title);
 				expect(response.body.activity.description).to.equal(activity1.description);
 				expect(response.body.activity.image).to.equal(activity1.image);
-				// expect(response.body.activity.category).to.equal(activity1.category);
 				expect(response.body.activity.memberLimit).to.equal(activity1.memberLimit);
 				expect(response.body.activity.due_date).to.includes(activity1.due_date);
 				expect(response.body.activity.location).to.equal(activity1.location);
@@ -154,14 +150,12 @@ chai.use(chaiHttp);
 
 				expect(response.body.activities[0].title).to.equal(activity1.title);
 				expect(response.body.activities[0].description).to.equal(activity1.description);
-				// expect(response.body.activities[0].category).to.equal(activity1.category);
 				expect(response.body.activities[0].location).to.equal(activity1.location);
 				expect(response.body.activities[0].tags[0]).to.equal(tags1[0]);
 				expect(response.body.activities[0].tags[1]).to.equal(tags1[1]);
 
 				expect(response.body.activities[1].title).to.equal(activity2.title);
 				expect(response.body.activities[1].description).to.equal(activity2.description);
-				// expect(response.body.activities[1].category).to.equal(activity2.category);
 				expect(response.body.activities[1].location).to.equal(activity2.location);
 				expect(response.body.activities[1].tags[0]).to.equal(tags2[0]);
 				expect(response.body.activities[1].tags[1]).to.equal(tags2[1]);
@@ -177,7 +171,6 @@ chai.use(chaiHttp);
 
 				expect(response.body.activities[0].title).to.equal(activity2.title);
 				expect(response.body.activities[0].description).to.equal(activity2.description);
-				// expect(response.body.activities[0].category).to.equal(activity2.category);
 				expect(response.body.activities[0].location).to.equal(activity2.location);
 				expect(response.body.activities[0].tags[0]).to.equal(tags2[0]);
 				expect(response.body.activities[0].tags[1]).to.equal(tags2[1]);
@@ -199,23 +192,10 @@ chai.use(chaiHttp);
 				expect(response).to.have.status(200);
 				expect(response.body.activity.title).to.equal(activity2.title);
 				expect(response.body.activity.description).to.equal(activity2.description);
-				// expect(response.body.activity.category).to.equal(activity2.category);
 				expect(response.body.activity.location).to.equal(activity2.location);
 				expect(response.body.activity.tags[0]).to.equal(tags2[0]);
 				expect(response.body.activity.tags[1]).to.equal(tags2[1]);
 			});
-
-			// it('should return activities with specified category - (code: 200)', async function() {
-			// 	const response = await chai.request(app).get(`/activities/category/movie`).set('token', token);
-
-			// 	expect(response).to.have.status(200);
-			// 	expect(response.body.activities[0].title).to.equal(activity2.title);
-			// 	expect(response.body.activities[0].description).to.equal(activity2.description);
-			// 	expect(response.body.activities[0].category).to.equal(activity2.category);
-			// 	expect(response.body.activities[0].location).to.equal(activity2.location);
-			// 	expect(response.body.activities[0].tags[0]).to.equal(tags2[0]);
-			// 	expect(response.body.activities[0].tags[1]).to.equal(tags2[1]);
-			// });
 
 			it('should return invalid ID error - (code: 400)', async function() {
 				const response = await chai.request(app).get(`/activities/invalidID`).set('token', token);
@@ -231,7 +211,6 @@ chai.use(chaiHttp);
 		      title: 'Makan Richeese',
 		      description: 'Makan bareng di Hacktiv8',
 		      image: '',
-		      // category: 'food',
 		      memberLimit: 8,
 		      due_date: '2020-02-28',
 		      location: 'Hacktiv8',

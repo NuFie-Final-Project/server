@@ -204,7 +204,7 @@ class UserController {
 
 	static async readSelf(req, res, next) {
 		try {
-			const user = await User.findById(req.userId);
+			const user = await User.findById(req.userId).populate('posts');
 			res.status(200).json({ user });
 		} catch (error) {
 			next(error);

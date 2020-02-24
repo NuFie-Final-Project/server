@@ -35,7 +35,7 @@ const activity1Data = {
 let createdUser0, createdUser1, createdUser2;
 let activity1, activity2;
 
-describe.only('/activities - Social', function() {
+describe('/activities - Social', function() {
 	before(async function() {
 		createdUser0 = await createUser(activityCreatorUser);
 		createdUser1 = await createUser(user1Data);

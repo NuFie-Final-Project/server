@@ -184,17 +184,8 @@ class ActivityController {
 		}
 	}
 
-	static async deleteOne(req, res, next) {
-		try {
-			const activity = await Activity.findByIdAndDelete(req.params.id);
-			res.status(200).json({ activity });
-		} catch (error) {
-			next(error);
-		}
-	}
-
 	static async commit(req, res, next) {
-		try {
+		try{
 			const status = 'commit';
 			const activity = await Activity.findByIdAndUpdate(req.params.id, { status }, { new: true });
 
@@ -246,7 +237,7 @@ class ActivityController {
 
 			res.status(200).json({ activity });
 		} catch (error) {
-			next(error);
+			next(error)
 		}
 	}
 
@@ -451,7 +442,6 @@ class ActivityController {
 				_id: req.params.id,
 				pendingJoins: targetId
 			});
-
 			if (!activity)
 				throw {
 					errorCode: 400,

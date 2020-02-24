@@ -7,19 +7,20 @@ const { createUser, createActivity, removeAllUser, removeAllActivity } = require
 
 chai.use(chaiHttp);
 
-	describe.only('/activities', function() {
-	// describe('/activities', function() {
+	// describe.only('/activities', function() {
+	describe('/activities', function() {
 		let token = '';
 		let activity1Id = '';
 		let activity2Id = '';
+		let dummyId = '5e5350bbe09ec01d69db66b0'
 		let tags1 = [ 'coldplay', 'konser' ]
 		let tags2 = [ 'wars', 'star' ]
 		const activity1 = {
 			title: 'Coldplay',
 			description: 'Nonton konser Coldplay',
 			image: '',
-			category: 'music',
-			memberLimit: 5,
+			// category: 'music',
+			memberLimit: 10,
 			due_date: '2020-02-25',
 			location: 'BSD',
 			address: 'Jl. Grand Boulevard',
@@ -32,7 +33,7 @@ chai.use(chaiHttp);
 			title: 'Star Wars',
 			description: 'Nonton Star Wars di bioskop',
 			image: '',
-			category: 'movie',
+			// category: 'movie',
 			memberLimit: 5,
 			due_date: '2020-02-27',
 			location: 'Pondok Indah',
@@ -98,7 +99,7 @@ chai.use(chaiHttp);
 		describe('POST /activities', function() {
 			it('should create a new activity - (code: 201)', async function() {
 				const response = await chai.request(app).post('/activities').set('token', token).send(activity1);
-
+				activity1Id = response.body.activity._id
 				expect(response).to.have.status(201);
 				expect(response.body).to.be.an('object');
 				expect(response.body).to.have.property('activity');
@@ -113,7 +114,7 @@ chai.use(chaiHttp);
 				expect(response.body.activity.title).to.equal(activity1.title);
 				expect(response.body.activity.description).to.equal(activity1.description);
 				expect(response.body.activity.image).to.equal(activity1.image);
-				expect(response.body.activity.category).to.equal(activity1.category);
+				// expect(response.body.activity.category).to.equal(activity1.category);
 				expect(response.body.activity.memberLimit).to.equal(activity1.memberLimit);
 				expect(response.body.activity.due_date).to.includes(activity1.due_date);
 				expect(response.body.activity.location).to.equal(activity1.location);
@@ -140,12 +141,11 @@ chai.use(chaiHttp);
 		describe('GET /activities', function() {
 			before(async function() {
 				let activity = await createActivity(activity2);
-				activityId = activity._id;
+				activity2Id = activity._id;
 			});
 
 			it('should get all activity - (code: 200)', async function() {
 				const response = await chai.request(app).get('/activities').set('token', token);
-
 				expect(response).to.have.status(200);
 				expect(response.body).to.be.an('object');
 				expect(response.body).to.have.property('activities');
@@ -154,17 +154,34 @@ chai.use(chaiHttp);
 
 				expect(response.body.activities[0].title).to.equal(activity1.title);
 				expect(response.body.activities[0].description).to.equal(activity1.description);
-				expect(response.body.activities[0].category).to.equal(activity1.category);
+				// expect(response.body.activities[0].category).to.equal(activity1.category);
 				expect(response.body.activities[0].location).to.equal(activity1.location);
 				expect(response.body.activities[0].tags[0]).to.equal(tags1[0]);
 				expect(response.body.activities[0].tags[1]).to.equal(tags1[1]);
 
 				expect(response.body.activities[1].title).to.equal(activity2.title);
 				expect(response.body.activities[1].description).to.equal(activity2.description);
-				expect(response.body.activities[1].category).to.equal(activity2.category);
+				// expect(response.body.activities[1].category).to.equal(activity2.category);
 				expect(response.body.activities[1].location).to.equal(activity2.location);
 				expect(response.body.activities[1].tags[0]).to.equal(tags2[0]);
 				expect(response.body.activities[1].tags[1]).to.equal(tags2[1]);
+			});
+
+			it('should get activity with specified interest - (code: 200)', async function() {
+				const response = await chai.request(app).get('/activities/interest/star').set('token', token);
+				expect(response).to.have.status(200);
+				expect(response.body).to.be.an('object');
+				expect(response.body).to.have.property('activities');
+				expect(response.body.activities).to.be.an('array');
+				expect(response.body.activities.length).to.equal(1);
+
+				expect(response.body.activities[0].title).to.equal(activity2.title);
+				expect(response.body.activities[0].description).to.equal(activity2.description);
+				// expect(response.body.activities[0].category).to.equal(activity2.category);
+				expect(response.body.activities[0].location).to.equal(activity2.location);
+				expect(response.body.activities[0].tags[0]).to.equal(tags2[0]);
+				expect(response.body.activities[0].tags[1]).to.equal(tags2[1]);
+
 			});
 
 			it('should return user authentication error - (code: 400)', async function() {
@@ -177,28 +194,28 @@ chai.use(chaiHttp);
 			});
 
 			it('should return one activity with details - (code: 200)', async function() {
-				const response = await chai.request(app).get(`/activities/${activityId}`).set('token', token);
+				const response = await chai.request(app).get(`/activities/${activity2Id}`).set('token', token);
 
 				expect(response).to.have.status(200);
 				expect(response.body.activity.title).to.equal(activity2.title);
 				expect(response.body.activity.description).to.equal(activity2.description);
-				expect(response.body.activity.category).to.equal(activity2.category);
+				// expect(response.body.activity.category).to.equal(activity2.category);
 				expect(response.body.activity.location).to.equal(activity2.location);
 				expect(response.body.activity.tags[0]).to.equal(tags2[0]);
 				expect(response.body.activity.tags[1]).to.equal(tags2[1]);
 			});
 
-			it('should return activities with specified category - (code: 200)', async function() {
-				const response = await chai.request(app).get(`/activities/category/movie`).set('token', token);
+			// it('should return activities with specified category - (code: 200)', async function() {
+			// 	const response = await chai.request(app).get(`/activities/category/movie`).set('token', token);
 
-				expect(response).to.have.status(200);
-				expect(response.body.activities[0].title).to.equal(activity2.title);
-				expect(response.body.activities[0].description).to.equal(activity2.description);
-				expect(response.body.activities[0].category).to.equal(activity2.category);
-				expect(response.body.activities[0].location).to.equal(activity2.location);
-				expect(response.body.activities[0].tags[0]).to.equal(tags2[0]);
-				expect(response.body.activities[0].tags[1]).to.equal(tags2[1]);
-			});
+			// 	expect(response).to.have.status(200);
+			// 	expect(response.body.activities[0].title).to.equal(activity2.title);
+			// 	expect(response.body.activities[0].description).to.equal(activity2.description);
+			// 	expect(response.body.activities[0].category).to.equal(activity2.category);
+			// 	expect(response.body.activities[0].location).to.equal(activity2.location);
+			// 	expect(response.body.activities[0].tags[0]).to.equal(tags2[0]);
+			// 	expect(response.body.activities[0].tags[1]).to.equal(tags2[1]);
+			// });
 
 			it('should return invalid ID error - (code: 400)', async function() {
 				const response = await chai.request(app).get(`/activities/invalidID`).set('token', token);
@@ -211,24 +228,51 @@ chai.use(chaiHttp);
 		describe('PATCH /activities', function() {
 		  it('should return edited activity - (code: 200)', async function() {
 		    const activityEdit = {
-		      title: 'Star Wars',
-		      description: 'Nonton Star Wars di bioskop',
+		      title: 'Makan Richeese',
+		      description: 'Makan bareng di Hacktiv8',
 		      image: '',
-		      category: 'movie',
-		      memberLimit: 5,
-		      due_date: '2020-02-27',
-		      location: 'Pondok Indah Mall',
-		      address: 'Jl. Sultan',
-		      tags: ['wars', 'star'],
+		      // category: 'food',
+		      memberLimit: 8,
+		      due_date: '2020-02-28',
+		      location: 'Hacktiv8',
+		      address: 'Jl. Sultan No. 7',
+		      tags: ['makan', 'siang'],
 		      status: 'open',
-		      isPromo: false,
-		      owner: 
+		      isPromo: false
 		    };
 		    const response = await chai
 		        .request(app)
-		        .patch(`/activities/${activityId}`)
+		        .patch(`/activities/${activity1Id}`)
+		        .send(activityEdit)
 		        .set('token', token)
-		        console.log(response.body)
+
+		    expect(response).to.have.status(200)
+		    expect(response.body.activity.title).to.equal(activityEdit.title)
+		    expect(response.body.activity.memberLimit).to.equal(activityEdit.memberLimit)
+		    expect(response.body.activity.location).to.equal(activityEdit.location)
 		  });
 		});
+
+		describe('POST /activities/commit', function() {
+		  it('should change activity status to commit- (code: 200)', async function() {
+		    const response = await chai
+		        .request(app)
+		        .post(`/activities/commit/${activity1Id}`)
+		        .set('token', token)
+
+		    expect(response).to.have.status(200)
+		    expect(response.body.activity.status).to.equal('commit')
+		  });
+		  
+		  it('should return activity is not found - (code: 401)', async function() {
+		    const response = await chai
+		        .request(app)
+		        .post(`/activities/commit/${dummyId}`)
+		        .set('token', token)
+
+		    expect(response).to.have.status(401)
+		    expect(response.body.message).to.equal("Activity authorization failed / activity cannot be found")
+		  });
+		});
+
 });

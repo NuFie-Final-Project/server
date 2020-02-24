@@ -99,6 +99,19 @@ describe('/activities - Social', function() {
 		});
 	});
 
+	describe('Invite a member to an activity: POST /activities/invite/:id', function() {
+		it('Should return an error because the invited user is already a member - status 400', async function() {
+			const resp = await chai
+				.request(app)
+				.post(`/activities/invite/${activity1._id}`)
+				.set({ token: createdUser0.token })
+				.send({ targetId: createdUser1.user._id });
+
+			expect(resp).to.have.status(400);
+			expect(resp.body.message).to.equal('You already have invited this user to this activity');
+		});
+	});
+
 	describe('Activity owner kicks an activity member: POST /activities/kick/:id', function() {
 		it('Should return an updated activity where the members array contains nothing - status 200', async function() {
 			const resp = await chai
@@ -149,6 +162,19 @@ describe('/activities - Social', function() {
 
 			expect(resp).to.have.status(200);
 			expect(resp.body.activity.members[0]).to.equal(createdUser1.user._id.toString());
+		});
+	});
+
+	describe('Accepting a user join request that is not in pending join: POST /activities/joinAccept/:id', function() {
+		it('Should return an error because the user is not in pending join list - status 400', async function() {
+			const resp = await chai
+				.request(app)
+				.post(`/activities/joinAccept/${activity1._id}`)
+				.set({ token: createdUser0.token })
+				.send({ targetId: createdUser1.user._id });
+
+			expect(resp).to.have.status(400);
+			expect(resp.body.message).to.equal('The user you want to accept is not in pending join');
 		});
 	});
 

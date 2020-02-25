@@ -1,6 +1,7 @@
 const Activity = require('../models/Activity.js');
 const User = require('../models/User.js');
 const axios = require('axios');
+const mongoose = require('mongoose');
 
 class ActivityController {
 	static async create(req, res, next) {
@@ -10,11 +11,11 @@ class ActivityController {
 
 			const image = req.file && req.file.location ? req.file.location : '';
 			const tags = req.body && req.body.tags && req.body.tags != '[]' ? JSON.parse(req.body.tags) : [];
-                        let isPromo = undefined
-                        if(req.body && req.body.isPromo) {
-                            if(req.body.isPromo == 'false') isPromo = false
-                            else isPromo = true
-                        }
+			let isPromo = undefined;
+			if (req.body && req.body.isPromo) {
+				if (req.body.isPromo == 'false') isPromo = false;
+				else isPromo = true;
+			}
 			const activity = await Activity.create({
 				owner,
 				title,
@@ -52,7 +53,9 @@ class ActivityController {
 			const activities = await Activity.find()
 				.limit(limit)
 				.skip(limit * (page - 1))
-				.populate('owner', '-password -posts');
+				.populate('owner', '-password -posts')
+				.populate('pendingJoins', '-password -posts')
+				.sort({ updatedAt: -1 });
 
 			res.status(200).json({ activities });
 		} catch (error) {
@@ -66,7 +69,69 @@ class ActivityController {
 			const page = req.query && req.query.page ? +req.query.page : 1;
 			const interest = req.params && req.params.interest ? req.params.interest : 'other';
 
-			const activities = await Activity.find({ tags: interest }).limit(limit).skip(limit * (page - 1));
+			let filter = {};
+
+			if (interest.toLowerCase == 'other') {
+				filter = {
+					tags: {
+						$nin: [ 'music', 'movie', 'sports', 'traveling', 'food' ]
+					}
+				};
+			} else {
+				filter = {
+					tags: new RegExp(`^${interest}$`, 'i')
+				};
+			}
+
+			const activities = await Activity.find(filter)
+				.limit(limit)
+				.skip(limit * (page - 1))
+				.populate('owner', '-password');
+			res.status(200).json({ activities });
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	static async getRecommendedActivities(req, res, next) {
+		try {
+			const limit = req.query && req.query.limit ? +req.query.limit : 10;
+			const page = req.query && req.query.page ? +req.query.page : 1;
+
+			const user = await User.findById(req.userId);
+
+			console.log(user);
+
+			const activities = await Activity.aggregate([
+				{
+					$addFields: {
+						weight: {
+							$size: {
+								$setIntersection: [ '$tags', user.interests ]
+							}
+						}
+					}
+				},
+				{
+					$match: {
+						owner: {
+							$ne: mongoose.Types.ObjectId(req.userId)
+						}
+					}
+				},
+				{
+					$sort: {
+						weight: -1
+					}
+				},
+				{
+					$limit: limit
+				},
+				{
+					$skip: limit * (page - 1)
+				}
+			]);
+
 			res.status(200).json({ activities });
 		} catch (error) {
 			next(error);
@@ -90,14 +155,14 @@ class ActivityController {
 	static async updateOne(req, res, next) {
 		try {
 			const { title, description, memberLimit, due_date, location, address } = req.body;
-                        console.log(req.body)
+
 			const image = req.file && req.file.location ? req.file.location : null;
 			const tags = req.body && req.body.tags && req.body.tags != '[]' ? req.body.tags : null;
-                        let isPromo = undefined
-                        if(req.body && req.body.isPromo) {
-                            if(req.body.isPromo == 'false') isPromo = false
-                            else isPromo = true
-                        } 
+			let isPromo = undefined;
+			if (req.body && req.body.isPromo) {
+				if (req.body.isPromo == 'false') isPromo = false;
+				else isPromo = true;
+			}
 			const inputs = {};
 			if (title) inputs.title = title;
 			if (description) inputs.description = description;
@@ -107,8 +172,8 @@ class ActivityController {
 			if (location) inputs.location = location;
 			if (address) inputs.address = address;
 			if (tags) inputs.tags = tags;
-                        if (isPromo) inputs.isPromo = isPromo;
-                        console.log(inputs)
+			if (isPromo) inputs.isPromo = isPromo;
+			console.log(inputs);
 			const activity = await Activity.findByIdAndUpdate(req.params.id, inputs, {
 				new: true
 			});

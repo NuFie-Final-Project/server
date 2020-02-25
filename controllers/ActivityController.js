@@ -6,11 +6,15 @@ class ActivityController {
 	static async create(req, res, next) {
 		try {
 			const owner = req.userId;
-			const { title, description, memberLimit, due_date, location, address, status, isPromo } = req.body;
+			const { title, description, memberLimit, due_date, location, address, status } = req.body;
 
 			const image = req.file && req.file.location ? req.file.location : '';
 			const tags = req.body && req.body.tags && req.body.tags != '[]' ? JSON.parse(req.body.tags) : [];
-
+                        let isPromo = undefined
+                        if(req.body && req.body.isPromo) {
+                            if(req.body.isPromo == 'false') isPromo = false
+                            else isPromo = true
+                        }
 			const activity = await Activity.create({
 				owner,
 				title,
@@ -85,11 +89,15 @@ class ActivityController {
 
 	static async updateOne(req, res, next) {
 		try {
-			const { title, description, memberLimit, due_date, location, address, isPromo } = req.body;
-
+			const { title, description, memberLimit, due_date, location, address } = req.body;
+                        console.log(req.body)
 			const image = req.file && req.file.location ? req.file.location : null;
 			const tags = req.body && req.body.tags && req.body.tags != '[]' ? req.body.tags : null;
-
+                        let isPromo = undefined
+                        if(req.body && req.body.isPromo) {
+                            if(req.body.isPromo == 'false') isPromo = false
+                            else isPromo = true
+                        } 
 			const inputs = {};
 			if (title) inputs.title = title;
 			if (description) inputs.description = description;
@@ -99,7 +107,8 @@ class ActivityController {
 			if (location) inputs.location = location;
 			if (address) inputs.address = address;
 			if (tags) inputs.tags = tags;
-
+                        if (isPromo) inputs.isPromo = isPromo;
+                        console.log(inputs)
 			const activity = await Activity.findByIdAndUpdate(req.params.id, inputs, {
 				new: true
 			});

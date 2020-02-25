@@ -330,7 +330,7 @@ class UserController {
                 inputs.profilePicture = req.file.location;
             if (password) inputs.password = password;
             if (gender) inputs.gender = gender;
-            if (phoneNumber) inputs.phoneNumber = phoneNumber;
+            if (phoneNumber && phoneNumber != 'undefined') inputs.phoneNumber = phoneNumber;
             if (interests) inputs.interests = interests;
             if (aboutMe) inputs.aboutMe = aboutMe;
 

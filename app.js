@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 const routes = require("./routes");
 const errorHandler = require("./middlewares/errorHandler.js");
 
-const mongodbConnectionStr = `mongodb://localhost:27017/nufie-${process.env.NODE_ENV}`;
+const mongodbConnectionStr = `mongodb+srv://zoezachary:zoe123123@hikari03-cu2nb.mongodb.net/nufie_development?retryWrites=true&w=majority`;
 
 mongoose.connect(mongodbConnectionStr, {
     useNewUrlParser: true,

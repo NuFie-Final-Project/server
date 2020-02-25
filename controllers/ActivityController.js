@@ -54,6 +54,7 @@ class ActivityController {
 				.limit(limit)
 				.skip(limit * (page - 1))
 				.populate('owner', '-password -posts')
+				.populate('pendingJoins', '-password -posts')
 				.sort({ updatedAt: -1 });
 
 			res.status(200).json({ activities });
@@ -82,7 +83,10 @@ class ActivityController {
 				};
 			}
 
-			const activities = await Activity.find(filter).limit(limit).skip(limit * (page - 1));
+			const activities = await Activity.find(filter)
+				.limit(limit)
+				.skip(limit * (page - 1))
+				.populate('owner', '-password');
 			res.status(200).json({ activities });
 		} catch (error) {
 			next(error);

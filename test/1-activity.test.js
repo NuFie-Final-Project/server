@@ -132,6 +132,178 @@ chai.use(chaiHttp);
 				expect(response.body.message[1]).to.equal('Description is required');
 				//tambah validation2 yg lain
 			});
+
+			it('should return error because title is required - (code: 400)', async function() {
+		    const activityError = {
+		      title: '',
+		      description: 'Makan bareng di Hacktiv8',
+		      image: '',
+		      memberLimit: 8,
+		      due_date: '2020-02-28',
+		      location: 'Hacktiv8',
+		      address: 'Jl. Sultan No. 7',
+		      tags: JSON.stringify(['makan', 'siang']),
+		      status: 'open',
+		      isPromo: false
+		    };
+		    const response = await chai
+		        .request(app)
+		        .post(`/activities`)
+		        .send(activityError)
+		        .set('token', token)
+
+				expect(response).to.have.status(400);
+				expect(response.body.message).to.be.an('array');
+				expect(response.body.message[0]).to.equal('Title is required');
+		  });
+
+			it('should return error because title is too long - (code: 400)', async function() {
+		    const activityError = {
+		      title: 'Makan Richeese bareng di Hacktiv8',
+		      description: 'Makan bareng di Hacktiv8',
+		      image: '',
+		      memberLimit: 8,
+		      due_date: '2020-02-28',
+		      location: 'Hacktiv8',
+		      address: 'Jl. Sultan No. 7',
+		      tags: JSON.stringify(['makan', 'siang']),
+		      status: 'open',
+		      isPromo: false
+		    };
+		    const response = await chai
+		        .request(app)
+		        .post(`/activities`)
+		        .send(activityError)
+		        .set('token', token)
+
+				expect(response).to.have.status(400);
+				expect(response.body.message).to.be.an('array');
+				expect(response.body.message[0]).to.equal('Title is too long');
+		  });
+
+		  it('should return error because title is too short - (code: 400)', async function() {
+		    const activityError = {
+		      title: 'M',
+		      description: 'Makan bareng di Hacktiv8',
+		      image: '',
+		      memberLimit: 8,
+		      due_date: '2020-02-28',
+		      location: 'Hacktiv8',
+		      address: 'Jl. Sultan No. 7',
+		      tags: JSON.stringify(['makan', 'siang']),
+		      status: 'open',
+		      isPromo: false
+		    };
+		    const response = await chai
+		        .request(app)
+		        .post(`/activities`)
+		        .send(activityError)
+		        .set('token', token)
+
+				expect(response).to.have.status(400);
+				expect(response.body.message).to.be.an('array');
+				expect(response.body.message[0]).to.equal('Title is too short');
+		  });
+
+		  it('should return error because description is required - (code: 400)', async function() {
+		    const activityError = {
+		      title: 'Makan Richeese',
+		      description: '',
+		      image: '',
+		      memberLimit: 8,
+		      due_date: '2020-02-28',
+		      location: 'Hacktiv8',
+		      address: 'Jl. Sultan No. 7',
+		      tags: JSON.stringify(['makan', 'siang']),
+		      status: 'open',
+		      isPromo: false
+		    };
+		    const response = await chai
+		        .request(app)
+		        .post(`/activities`)
+		        .send(activityError)
+		        .set('token', token)
+
+				expect(response).to.have.status(400);
+				expect(response.body.message).to.be.an('array');
+				expect(response.body.message[0]).to.equal('Description is required');
+		  });
+
+		  it('should return error because description is too short - (code: 400)', async function() {
+		    const activityError = {
+		      title: 'Makan Richeese',
+		      description: 'M',
+		      image: '',
+		      memberLimit: 8,
+		      due_date: '2020-02-28',
+		      location: 'Hacktiv8',
+		      address: 'Jl. Sultan No. 7',
+		      tags: JSON.stringify(['makan', 'siang']),
+		      status: 'open',
+		      isPromo: false
+		    };
+		    const response = await chai
+		        .request(app)
+		        .post(`/activities`)
+		        .send(activityError)
+		        .set('token', token)
+
+				expect(response).to.have.status(400);
+				expect(response.body.message).to.be.an('array');
+				expect(response.body.message[0]).to.equal('Description is too short');
+		  });
+
+		  it('should return error because description is too long - (code: 400)', async function() {
+		  	let description = ''
+		  	for (let i = 0; i < 301; i += 1){
+		  		description += 'a'
+		  	}
+		    const activityError = {
+		      title: 'Makan Richeese',
+		      description,
+		      image: '',
+		      memberLimit: 8,
+		      due_date: '2020-02-28',
+		      location: 'Hacktiv8',
+		      address: 'Jl. Sultan No. 7',
+		      tags: JSON.stringify(['makan', 'siang']),
+		      status: 'open',
+		      isPromo: false
+		    };
+		    const response = await chai
+		        .request(app)
+		        .post(`/activities`)
+		        .send(activityError)
+		        .set('token', token)
+
+				expect(response).to.have.status(400);
+				expect(response.body.message).to.be.an('array');
+				expect(response.body.message[0]).to.equal('Description is too long');
+		  });
+
+		  it('should return error because memberLimit is not a number - (code: 400)', async function() {
+		    const activityError = {
+		      title: 'Makan Richeese',
+		      description: 'Makan bareng di Hacktiv8',
+		      image: '',
+		      memberLimit: 'a',
+		      due_date: '2020-02-28',
+		      location: 'Hacktiv8',
+		      address: 'Jl. Sultan No. 7',
+		      tags: JSON.stringify(['makan', 'siang']),
+		      status: 'open',
+		      isPromo: false
+		    };
+		    const response = await chai
+		        .request(app)
+		        .post(`/activities`)
+		        .send(activityError)
+		        .set('token', token)
+
+				expect(response).to.have.status(400);
+				expect(response.body.message).to.be.an('array');
+				expect(response.body.message[0]).to.includes('memberLimit');
+		  });
 		});
 
 		describe('GET /activities', function() {
@@ -201,7 +373,7 @@ chai.use(chaiHttp);
 				const response = await chai.request(app).get(`/activities/invalidID`).set('token', token);
 
 				expect(response).to.have.status(400);
-				expect(response.body.message).to.equal('Invalid ID type');
+				expect(response.body.message).to.equal('Invalid ObjectId');
 			});
 		});
 
@@ -229,6 +401,55 @@ chai.use(chaiHttp);
 		    expect(response.body.activity.title).to.equal(activityEdit.title)
 		    expect(response.body.activity.memberLimit).to.equal(activityEdit.memberLimit)
 		    expect(response.body.activity.location).to.equal(activityEdit.location)
+		  });
+
+		  it('should return error because title is too short - (code: 400)', async function() {
+		    const activityEdit = {
+		      title: 'M',
+		      description: 'Makan bareng di Hacktiv8',
+		      image: '',
+		      memberLimit: 8,
+		      due_date: '2020-02-28',
+		      location: 'Hacktiv8',
+		      address: 'Jl. Sultan No. 7',
+		      tags: ['makan', 'siang'],
+		      status: 'open',
+		      isPromo: false
+		    };
+		    const response = await chai
+		        .request(app)
+		        .patch(`/activities/${activity1Id}`)
+		        .send(activityEdit)
+		        .set('token', token)
+
+		    expect(response).to.have.status(400)
+				expect(response.body.message).to.be.an('array');
+				expect(response.body.message[0]).to.equal('Title is too short');
+		  });
+
+
+
+		  it('should return error because invalid date - (code: 400)', async function() {
+		    const activityEdit = {
+		      title: 'Makan Richeese',
+		      description: 'Makan bareng di Hacktiv8',
+		      image: '',
+		      memberLimit: 8,
+		      due_date: '2020-02-281',
+		      location: 'Hacktiv8',
+		      address: 'Jl. Sultan No. 7',
+		      tags: ['makan', 'siang'],
+		      status: 'open',
+		      isPromo: false
+		    };
+		    const response = await chai
+		        .request(app)
+		        .patch(`/activities/${activity1Id}`)
+		        .send(activityEdit)
+		        .set('token', token)
+
+				expect(response).to.have.status(400);
+				expect(response.body.message).to.equal('Invalid date');
 		  });
 		});
 

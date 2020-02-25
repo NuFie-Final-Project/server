@@ -10,13 +10,13 @@ const activitySchema = new Schema({
 	title: {
 		type: String,
 		required: [ true, 'Title is required' ],
-		minlength: [ 1, 'Title is too short' ],
+		minlength: [ 2, 'Title is too short' ],
 		maxlength: [ 30, 'Title is too long' ]
 	},
 	description: {
 		type: String,
 		required: [ true, 'Description is required' ],
-		minlength: [ 1, 'Description is too short' ],
+		minlength: [ 2, 'Description is too short' ],
 		maxlength: [ 300, 'Description is too long' ]
 	},
 	image: {

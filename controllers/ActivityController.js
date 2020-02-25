@@ -175,7 +175,7 @@ class ActivityController {
 			if (isPromo) inputs.isPromo = isPromo;
 			console.log(inputs);
 			const activity = await Activity.findByIdAndUpdate(req.params.id, inputs, {
-				new: true
+				new: true, runValidators: true
 			});
 
 			res.status(200).json({ activity });
@@ -190,22 +190,23 @@ class ActivityController {
 			const activity = await Activity.findByIdAndUpdate(req.params.id, { status }, { new: true });
 
 			const { pushTokens } = req.body;
-
-			pushTokens.forEach((pushToken) => {
-				axios.post(
-					`https://exp.host/--/api/v2/push/send`,
-					{
-						to: pushToken,
-						title: 'Activity plan has been finalized'
-					},
-					{
-						host: 'exp.host',
-						accept: 'application/json',
-						'accept-encoding': 'gzip, deflate',
-						'content-type': 'application/json'
-					}
-				);
-			});
+			if (pushTokens){
+				pushTokens.forEach((pushToken) => {
+					axios.post(
+						`https://exp.host/--/api/v2/push/send`,
+						{
+							to: pushToken,
+							title: 'Activity plan has been finalized'
+						},
+						{
+							host: 'exp.host',
+							accept: 'application/json',
+							'accept-encoding': 'gzip, deflate',
+							'content-type': 'application/json'
+						}
+					);
+				});
+			}
 
 			res.status(200).json({ activity });
 		} catch (error) {

@@ -100,6 +100,4 @@ describe('/user', function() {
 			expect(response.body.user.posts[0]).to.equal(activity1._id);
 		});
 	});
-
-	// describe('Get');
 });

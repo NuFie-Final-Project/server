@@ -7,7 +7,7 @@ const { removeAllUser, createUser, createActivity, removeAllActivity } = require
 
 chai.use(chaiHttp);
 
-describe.only('Authentication and Authorization', function () {
+describe('Authentication and Authorization', function () {
   describe('User Routes', function () {
     it('should return token required error - status 400', async function () {
       const resp = await chai

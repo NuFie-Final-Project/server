@@ -1,5 +1,5 @@
 function errorHandler(err, req, res, next) {
-    console.log(err);
+    // console.log(err)
     // console.log(Object.keys(err.errors));
 
     let errorCode = err.errorCode || 500;
@@ -7,9 +7,8 @@ function errorHandler(err, req, res, next) {
 
     if (err.name == "CastError") {
         errorCode = 400;
-        message = "Invalid ID type";
+        message = `Invalid ${err.kind}`;
     }
-
     if (err.errors) {
         errorCode = 400;
         message = [];

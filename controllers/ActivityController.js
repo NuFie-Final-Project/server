@@ -175,18 +175,9 @@ class ActivityController {
 			if (isPromo) inputs.isPromo = isPromo;
 			console.log(inputs);
 			const activity = await Activity.findByIdAndUpdate(req.params.id, inputs, {
-				new: true
+				new: true, runValidators: true
 			});
 
-			res.status(200).json({ activity });
-		} catch (error) {
-			next(error);
-		}
-	}
-
-	static async deleteOne(req, res, next) {
-		try {
-			const activity = await Activity.findByIdAndDelete(req.params.id);
 			res.status(200).json({ activity });
 		} catch (error) {
 			next(error);
@@ -194,27 +185,28 @@ class ActivityController {
 	}
 
 	static async commit(req, res, next) {
-		try {
+		try{
 			const status = 'commit';
 			const activity = await Activity.findByIdAndUpdate(req.params.id, { status }, { new: true });
 
 			const { pushTokens } = req.body;
-
-			pushTokens.forEach((pushToken) => {
-				axios.post(
-					`https://exp.host/--/api/v2/push/send`,
-					{
-						to: pushToken,
-						title: 'Activity plan has been finalized'
-					},
-					{
-						host: 'exp.host',
-						accept: 'application/json',
-						'accept-encoding': 'gzip, deflate',
-						'content-type': 'application/json'
-					}
-				);
-			});
+			if (pushTokens){
+				pushTokens.forEach((pushToken) => {
+					axios.post(
+						`https://exp.host/--/api/v2/push/send`,
+						{
+							to: pushToken,
+							title: 'Activity plan has been finalized'
+						},
+						{
+							host: 'exp.host',
+							accept: 'application/json',
+							'accept-encoding': 'gzip, deflate',
+							'content-type': 'application/json'
+						}
+					);
+				});
+			}
 
 			res.status(200).json({ activity });
 		} catch (error) {
@@ -246,7 +238,7 @@ class ActivityController {
 
 			res.status(200).json({ activity });
 		} catch (error) {
-			next(error);
+			next(error)
 		}
 	}
 
@@ -451,7 +443,6 @@ class ActivityController {
 				_id: req.params.id,
 				pendingJoins: targetId
 			});
-
 			if (!activity)
 				throw {
 					errorCode: 400,

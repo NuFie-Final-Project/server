@@ -84,9 +84,8 @@ describe('/user', function() {
 			const response = await chai.request(app).get('/users').set({
 				token: createdUser0.token
 			});
-
 			expect(response).to.have.status(200);
-			expect(response.body.user.posts[0]).to.equal(activity1._id);
+			expect(response.body.user.posts[0]._id).to.equal(activity1._id);
 		});
 	});
 
@@ -101,6 +100,4 @@ describe('/user', function() {
 			expect(response.body.user.posts[0]).to.equal(activity1._id);
 		});
 	});
-
-	// describe('Get');
 });

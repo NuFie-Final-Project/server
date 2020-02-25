@@ -9,6 +9,7 @@ const {
 const { singleUpload } = require('../services/imageUpload');
 
 router.use(userAuthentication);
+
 router.post('/', singleUpload, ActivityController.create);
 router.get('/', ActivityController.read);
 router.get('/getRecommendedActivities', userAuthentication, ActivityController.getRecommendedActivities);

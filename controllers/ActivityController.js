@@ -70,7 +70,7 @@ class ActivityController {
 
 			let filter = {};
 
-			if (interest == 'other') {
+			if ((interest).toLowerCase() == 'other') {
 				filter = {
 					tags: {
 						$nin: [ 'music', 'movie', 'sports', 'traveling', 'food' ]

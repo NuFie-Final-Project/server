@@ -67,6 +67,17 @@ describe('/user', function() {
 			expect(response).to.have.status(200);
 			expect(response.body.user.lastName).to.equal('Bond');
 		});
+
+		it('Should return an error response User authentication error: requires token - status 400', async function() {
+			const updateData = {
+				lastName: 'Bond'
+			};
+
+			const response = await chai.request(app).patch('/users').send(updateData);
+
+			expect(response).to.have.status(400);
+			expect(response.body.message).to.equal('User authentication error: requires token');
+		});
 	});
 
 	describe('Get self detail: GET /users', function() {
@@ -87,6 +98,13 @@ describe('/user', function() {
 			expect(response).to.have.status(200);
 			expect(response.body.user.posts[0]._id).to.equal(activity1._id);
 		});
+
+		it('Should return an error response User authentication error: requires token - status 400', async function() {
+			const response = await chai.request(app).get('/users');
+
+			expect(response).to.have.status(400);
+			expect(response.body.message).to.equal('User authentication error: requires token');
+		});
 	});
 
 	describe('Get user detail by id: GET /users/:id', function() {
@@ -98,6 +116,13 @@ describe('/user', function() {
 			expect(response).to.have.status(200);
 			expect(response.body.user._id).to.equals(createdUser0.user._id.toString());
 			expect(response.body.user.posts[0]).to.equal(activity1._id);
+		});
+
+		it('Should return an error response User authentication error: requires token - status 400', async function() {
+			const response = await chai.request(app).get(`/users/${createdUser0.user._id}`);
+
+			expect(response).to.have.status(400);
+			expect(response.body.message).to.equal('User authentication error: requires token');
 		});
 	});
 });

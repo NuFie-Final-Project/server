@@ -397,7 +397,7 @@ chai.use(chaiHttp);
 		      due_date: '2020-02-28',
 		      location: 'Hacktiv8',
 		      address: 'Jl. Sultan No. 7',
-		      tags: ['makan', 'siang'],
+		      tags: JSON.stringify(['makan', 'siang']),
 		      status: 'open',
 		      isPromo: true
 		    };
@@ -406,7 +406,6 @@ chai.use(chaiHttp);
 		        .patch(`/activities/${activity1Id}`)
 		        .send(activityEdit)
 		        .set('token', token)
-
 		    expect(response).to.have.status(200)
 		    expect(response.body.activity.title).to.equal(activityEdit.title)
 		    expect(response.body.activity.memberLimit).to.equal(activityEdit.memberLimit)
@@ -422,7 +421,7 @@ chai.use(chaiHttp);
 		      due_date: '2020-02-28',
 		      location: 'Hacktiv8',
 		      address: 'Jl. Sultan No. 7',
-		      tags: ['makan', 'siang'],
+		      tags: JSON.stringify(['makan', 'siang']),
 		      status: 'open',
 		      isPromo: false
 		    };
@@ -448,7 +447,7 @@ chai.use(chaiHttp);
 		      due_date: '2020-02-281',
 		      location: 'Hacktiv8',
 		      address: 'Jl. Sultan No. 7',
-		      tags: ['makan', 'siang'],
+		      tags: JSON.stringify(['makan', 'siang']),
 		      status: 'open',
 		      isPromo: false
 		    };

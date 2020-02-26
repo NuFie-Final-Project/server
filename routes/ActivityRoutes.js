@@ -27,6 +27,6 @@ router.post('/joinAccept/:id', activityAuthorization, ActivityController.joinAcc
 router.post('/joinReject/:id', activityAuthorization, ActivityController.joinReject);
 router.post('/leave/:id', activityMemberAuthorization, ActivityController.leave);
 router.post('/chatNotification', ActivityController.chatNotification);
-router.delete('/:id', activityAuthorization, ActivityController.deleteOne);
+// router.delete('/:id', activityAuthorization, ActivityController.deleteOne);
 
 module.exports = router;

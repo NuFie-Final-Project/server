@@ -172,7 +172,6 @@ class ActivityController {
 			if (address) inputs.address = address;
 			if (tags) inputs.tags = tags;
 			if (isPromo) inputs.isPromo = isPromo;
-			console.log(inputs);
 			const activity = await Activity.findByIdAndUpdate(req.params.id, inputs, {
 				new: true,
 				runValidators: true
@@ -190,6 +189,7 @@ class ActivityController {
 			const activity = await Activity.findByIdAndUpdate(req.params.id, { status }, { new: true });
 
 			const { pushTokens } = req.body;
+			/* istanbul ignore next */
 			if (pushTokens) {
 				pushTokens.forEach((pushToken) => {
 					axios.post(
@@ -219,8 +219,8 @@ class ActivityController {
 			const activity = await Activity.findByIdAndUpdate(req.params.id, { status: 'cancelled' }, { new: true });
 
 			const { pushTokens } = req.body;
-
 			if (pushTokens) {
+				/* istanbul ignore next */
 				pushTokens.forEach((pushToken) => {
 					axios.post(
 						`https://exp.host/--/api/v2/push/send`,

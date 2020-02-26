@@ -71,7 +71,7 @@ class ActivityController {
 
 			let filter = {};
 
-			if ((interest).toLowerCase() == 'other') {
+			if (interest.toLowerCase() == 'other') {
 				filter = {
 					tags: {
 						$nin: [ 'music', 'movie', 'sports', 'traveling', 'food' ]
@@ -97,7 +97,7 @@ class ActivityController {
 		try {
 			const limit = req.query && req.query.limit ? +req.query.limit : 10;
 			const page = req.query && req.query.page ? +req.query.page : 1;
-                        const skip = limit * (page-1)
+			const skip = limit * (page - 1);
 			const user = await User.findById(req.userId);
 
 			const activities = await Activity.aggregate([
@@ -129,7 +129,7 @@ class ActivityController {
 					$limit: limit
 				}
 			]);
-                        await Activity.populate(activities, { path: 'owner', select: '-password' });
+			await Activity.populate(activities, { path: 'owner', select: '-password' });
 			res.status(200).json({ activities });
 		} catch (error) {
 			next(error);
@@ -155,7 +155,7 @@ class ActivityController {
 			const { title, description, memberLimit, due_date, location, address } = req.body;
 
 			const image = req.file && req.file.location ? req.file.location : null;
-                        const tags = req.body && req.body.tags && req.body.tags != '[]' ? JSON.parse(req.body.tags) : null;
+			const tags = req.body && req.body.tags && req.body.tags != '[]' ? JSON.parse(req.body.tags) : null;
 			let isPromo = undefined;
 			if (req.body && req.body.isPromo) {
 				if (req.body.isPromo == 'false') isPromo = false;
@@ -173,7 +173,8 @@ class ActivityController {
 			if (isPromo) inputs.isPromo = isPromo;
 			console.log(inputs);
 			const activity = await Activity.findByIdAndUpdate(req.params.id, inputs, {
-				new: true, runValidators: true
+				new: true,
+				runValidators: true
 			});
 
 			res.status(200).json({ activity });
@@ -183,12 +184,12 @@ class ActivityController {
 	}
 
 	static async commit(req, res, next) {
-		try{
+		try {
 			const status = 'commit';
 			const activity = await Activity.findByIdAndUpdate(req.params.id, { status }, { new: true });
 
 			const { pushTokens } = req.body;
-			if (pushTokens){
+			if (pushTokens) {
 				pushTokens.forEach((pushToken) => {
 					axios.post(
 						`https://exp.host/--/api/v2/push/send`,
@@ -218,25 +219,27 @@ class ActivityController {
 
 			const { pushTokens } = req.body;
 
-			pushTokens.forEach((pushToken) => {
-				axios.post(
-					`https://exp.host/--/api/v2/push/send`,
-					{
-						to: pushToken,
-						title: 'Activity plan has been cancelled'
-					},
-					{
-						host: 'exp.host',
-						accept: 'application/json',
-						'accept-encoding': 'gzip, deflate',
-						'content-type': 'application/json'
-					}
-				);
-			});
+			if (pushTokens) {
+				pushTokens.forEach((pushToken) => {
+					axios.post(
+						`https://exp.host/--/api/v2/push/send`,
+						{
+							to: pushToken,
+							title: 'Activity plan has been cancelled'
+						},
+						{
+							host: 'exp.host',
+							accept: 'application/json',
+							'accept-encoding': 'gzip, deflate',
+							'content-type': 'application/json'
+						}
+					);
+				});
+			}
 
 			res.status(200).json({ activity });
 		} catch (error) {
-			next(error)
+			next(error);
 		}
 	}
 

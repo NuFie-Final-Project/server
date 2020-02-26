@@ -240,6 +240,7 @@ class UserController {
 			const limit = req.query && req.query.limit ? +req.query.limit : 10;
 			const page = req.query && req.query.page ? +req.query.page : 1;
 			const tags = req.body && req.body.tags ? req.body.tags : [];
+                        const skip = limit * (page-1)
 			const users = await User.aggregate([
 				{
 					$addFields: {
@@ -263,13 +264,13 @@ class UserController {
 					}
 				},
 				{
-					$limit: limit
+					$skip: skip
 				},
 				{
-					$skip: limit * (page - 1)
+					$limit: limit
 				}
 			]);
-
+                        
 			res.status(200).json({ users, userId: req.userId });
 		} catch (error) {
 			next(error);

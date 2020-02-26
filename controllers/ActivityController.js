@@ -97,10 +97,8 @@ class ActivityController {
 		try {
 			const limit = req.query && req.query.limit ? +req.query.limit : 10;
 			const page = req.query && req.query.page ? +req.query.page : 1;
-
+                        const skip = limit * (page-1)
 			const user = await User.findById(req.userId);
-
-			console.log(user);
 
 			const activities = await Activity.aggregate([
 				{
@@ -125,13 +123,13 @@ class ActivityController {
 					}
 				},
 				{
-					$limit: limit
+					$skip: skip
 				},
 				{
-					$skip: limit * (page - 1)
+					$limit: limit
 				}
 			]);
-
+                        await Activity.populate(activities, { path: 'owner', select: '-password' });
 			res.status(200).json({ activities });
 		} catch (error) {
 			next(error);
@@ -157,7 +155,7 @@ class ActivityController {
 			const { title, description, memberLimit, due_date, location, address } = req.body;
 
 			const image = req.file && req.file.location ? req.file.location : null;
-			const tags = req.body && req.body.tags && req.body.tags != '[]' ? req.body.tags : null;
+                        const tags = req.body && req.body.tags && req.body.tags != '[]' ? JSON.parse(req.body.tags) : null;
 			let isPromo = undefined;
 			if (req.body && req.body.isPromo) {
 				if (req.body.isPromo == 'false') isPromo = false;

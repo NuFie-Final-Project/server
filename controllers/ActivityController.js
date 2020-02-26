@@ -79,6 +79,7 @@ class ActivityController {
 				};
 			} else {
 				filter = {
+					owner: { $ne: req.userId },
 					tags: new RegExp(`^${interest}$`, 'i')
 				};
 			}

@@ -32,15 +32,20 @@ const userSchema = new Schema({
 						v
 					);
 				},
-				message: (props) => `The email must be in a valid email format`
+				message: 
+				/*istanbul ignore next*/
+				(props) => `The email must be in a valid email format`
 			},
 			{
 				validator: async function(v) {
 					const user = await mongoose.models.User.findOne({ email: v });
+					/*istanbul ignore next*/
 					if (user) return false;
 					else return true;
 				},
-				message: (props) => `This email has been registered`
+				message: 
+				/*istanbul ignore next*/
+				(props) => `This email has been registered`
 			}
 		]
 	},
@@ -55,7 +60,9 @@ const userSchema = new Schema({
 				return /^\+62[0-9]{8,}$/.test(v);
 			},
 
-			message: (props) =>
+			message: 
+			/*istanbul ignore next*/
+			(props) =>
 				`The phone number must start with "+62", contain only numbers, and 10 digit minimum length`
 		}
 	},
@@ -82,9 +89,9 @@ userSchema.pre('save', function(next) {
 	next();
 });
 
-userSchema.pre('findOneAndDelete', function(next) {
-	next();
-});
+// userSchema.pre('findOneAndDelete', function(next) {
+// 	next();
+// });
 
 const User = mongoose.model('User', userSchema);
 

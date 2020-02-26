@@ -35,7 +35,7 @@ const activity1Data = {
 let createdUser0, createdUser1, createdUser2;
 let activity1, activity2;
 
-describe.only('/activities - Social', function() {
+describe('/activities - Social', function() {
 	before(async function() {
 		createdUser0 = await createUser(activityCreatorUser);
 		createdUser1 = await createUser(user1Data);
@@ -48,7 +48,7 @@ describe.only('/activities - Social', function() {
 	});
 
 	describe('Invite a user to an activity: POST /activities/invite/:id', function() {
-		it('Should return an updated activity object where the pendingInvites containing the target userId - status 200', async function() {
+		it('Should return an error Activity authorization failed - status 401', async function() {
 			let tempResp = await chai
 				.request(app)
 				.post('/activities')
@@ -57,6 +57,16 @@ describe.only('/activities - Social', function() {
 
 			activity1 = tempResp.body.activity;
 
+			const resp = await chai
+				.request(app)
+				.post(`/activities/inviteReject/${activity1._id}`)
+				.set({ token: createdUser1.token });
+
+			expect(resp).to.have.status(401);
+			expect(resp.body.message).to.equal('Activity authorization failed');
+		});
+
+		it('Should return an updated activity object where the pendingInvites containing the target userId - status 200', async function() {
 			const resp = await chai
 				.request(app)
 				.post(`/activities/invite/${activity1._id}`)
@@ -274,6 +284,16 @@ describe.only('/activities - Social', function() {
 
 			expect(resp).to.have.status(200);
 			expect(resp.body.activity.members.length).to.equal(0);
+		});
+
+		it('Should return an error Activity authorization failed - status 401', async function() {
+			const resp = await chai
+				.request(app)
+				.post(`/activities/leave/${activity1._id}`)
+				.set({ token: createdUser1.token });
+
+			expect(resp).to.have.status(401);
+			expect(resp.body.message).to.equal('Activity authorization failed');
 		});
 
 		it('Should return an error response User authentication error: requires token - status 400', async function() {

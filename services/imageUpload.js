@@ -9,6 +9,7 @@ aws.config.update({
 });
 
 const s3 = new aws.S3();
+/* istanbul ignore next */
 const upload = multer({
 	storage: multers3({
 		s3,

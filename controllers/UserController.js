@@ -4,7 +4,7 @@ const { OAuth2Client } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const axios = require('axios');
-
+/*istanbul ignore next*/
 class UserController {
 	static async signIn(req, res, next) {
 		try {

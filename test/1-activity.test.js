@@ -304,6 +304,23 @@ describe('/activities', function() {
 			expect(response.body.activities[0].tags[1]).to.equal(tags2[1]);
 		});
 
+		it('should get second page of activities - (code: 200)', async function() {
+			const response = await chai.request(app).get('/activities?page=2&limit=1').set('token', token);
+
+			expect(response).to.have.status(200);
+			expect(response.body).to.be.an('object');
+			expect(response.body).to.have.property('activities');
+			expect(response.body.activities).to.be.an('array');
+			expect(response.body.activities.length).to.equal(1);
+
+			expect(response.body.activities[0].title).to.equal(activity1.title);
+			expect(response.body.activities[0].description).to.equal(activity1.description);
+			expect(response.body.activities[0].location).to.equal(activity1.location);
+			expect(response.body.activities[0].tags[0]).to.equal(tags1[0]);
+			expect(response.body.activities[0].tags[1]).to.equal(tags1[1]);
+
+		});
+
 		it('should get activity with specified interest - (code: 200)', async function() {
 			const response = await chai.request(app).get('/activities/interest/star').set('token', token);
 			expect(response).to.have.status(200);
@@ -319,7 +336,7 @@ describe('/activities', function() {
 			expect(response.body.activities[0].tags[1]).to.equal(tags2[1]);
 		});
 
-		it('should get activity with "other" interest - (code: 200)', async function() {
+		it('should get activities with "other" interest - (code: 200)', async function() {
 			const response = await chai.request(app).get('/activities/interest/other').set('token', token);
 			expect(response).to.have.status(200);
 			expect(response.body).to.be.an('object');
@@ -330,6 +347,18 @@ describe('/activities', function() {
 			expect(response.body.activities[0].title).to.equal(activity1.title);
 			expect(response.body.activities[1].title).to.equal(activity2.title);
 		});
+
+		it('should get page 2 of activities with "other" interest - (code: 200)', async function() {
+			const response = await chai.request(app).get('/activities/interest/other?page=2&limit=1').set('token', token);
+			expect(response).to.have.status(200);
+			expect(response.body).to.be.an('object');
+			expect(response.body).to.have.property('activities');
+			expect(response.body.activities).to.be.an('array');
+			expect(response.body.activities.length).to.equal(1);
+
+			expect(response.body.activities[0].title).to.equal(activity2.title);
+		});
+
 
 		it('should return user authentication error - (code: 400)', async function() {
 			const response = await chai.request(app).get('/activities');
@@ -382,6 +411,32 @@ describe('/activities', function() {
 			expect(response.body.activity.title).to.equal(activityEdit.title);
 			expect(response.body.activity.memberLimit).to.equal(activityEdit.memberLimit);
 			expect(response.body.activity.location).to.equal(activityEdit.location);
+		});
+
+		it('should return activity with changed title - (code: 200)', async function() {
+			const activityEdit = {
+				title: 'Makan KFC'
+			};
+			const response = await chai
+				.request(app)
+				.patch(`/activities/${activity1Id}`)
+				.send(activityEdit)
+				.set('token', token);
+			expect(response).to.have.status(200);
+			expect(response.body.activity.title).to.equal(activityEdit.title);
+		});
+
+		it('should return activity with changed description - (code: 200)', async function() {
+			const activityEdit = {
+				description: 'Makan bareng teman di KFC'
+			};
+			const response = await chai
+				.request(app)
+				.patch(`/activities/${activity1Id}`)
+				.send(activityEdit)
+				.set('token', token);
+			expect(response).to.have.status(200);
+			expect(response.body.activity.description).to.equal(activityEdit.description);
 		});
 
 		it('should return error because title is too short - (code: 400)', async function() {
@@ -455,7 +510,7 @@ describe('/activities', function() {
 	});
 	describe('GET /getRecommendedActivities', function() {
 		it('should get recommended activities for current logged in user - (code: 200)', async function() {
-			const response = await chai.request(app).get(`/activities/getRecommendedActivities`).set('token', token);
+			const response = await chai.request(app).get(`/activities/getRecommendedActivities?page=1&limit=1`).set('token', token);
 
 			expect(response).to.have.status(200);
 			expect(response.body.activities[0].title).to.equal('Star Wars');
